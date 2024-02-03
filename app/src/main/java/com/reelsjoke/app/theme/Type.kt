@@ -1,4 +1,4 @@
-package com.reelsjoke.app.ui.theme
+package com.reelsjoke.app.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
