@@ -1,7 +1,6 @@
 package com.reelsjoke.app.domain.model
 
 import android.graphics.Bitmap
-import android.net.Uri
 import com.reelsjoke.app.core.extensions.toBase64
 import java.io.Serializable
 
@@ -32,10 +31,8 @@ data class ScreenInfo(
                 userTitle.isNotEmpty() &&
                 commentCount.isNotEmpty() &&
                 send.isNotEmpty() &&
-                description.isNotEmpty()
-
-               /* likes.isNotEmpty() == !isLikesHidden &&
-                taggedPeople?.isNotEmpty() == isTaggedPeople &&
-                location?.isNotEmpty() == isLocationExist*/
+                description.isNotEmpty() &&
+                commentCount.isNotEmpty() &&
+                send.isNotEmpty()
     }
 }

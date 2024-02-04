@@ -1,6 +1,6 @@
 package com.reelsjoke.app.presentation.create
 
-import com.reelsjoke.app.domain.model.ScreenInfo
+import android.graphics.Bitmap
 
 
 /**
@@ -8,6 +8,18 @@ import com.reelsjoke.app.domain.model.ScreenInfo
  */
 data class CreateScreenUIState(
     val isLoading: Boolean = false,
-    val error: String? = null,
-    val screenInfo: ScreenInfo? = null
+    val backgroundImage: Bitmap? = null,
+    val isLiked: Boolean = false,
+    val likesCount: String = "",
+    val commentCount: String = "",
+    val sendCount: String = "",
+    val userImage: Bitmap? = null,
+    val username: String = "",
+    val description: String = "",
+    val isFollowed: Boolean = false,
+    val isLikesCountHidden: Boolean = true,
+    val isTaggedPeople: Boolean = false,
+    val peopleTagged: String = "",
+    val isLocationExist: Boolean = false,
+    val location: String = ""
 )

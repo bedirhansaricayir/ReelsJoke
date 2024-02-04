@@ -33,7 +33,8 @@ class HomeScreenViewModel @Inject constructor(
     private val _effects = Channel<HomeScreenUIEffect>()
     val effects = _effects.receiveAsFlow()
 
-    private var balloonState: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val _balloonState: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val balloonState = _balloonState.asStateFlow()
 
 
     init {
@@ -41,10 +42,11 @@ class HomeScreenViewModel @Inject constructor(
         getCreatedReels()
     }
 
-    fun onEvent(event: HomeScreenEvent) {
+    fun onEvent(event: HomeScreenUIEvent) {
         when (event) {
-            is HomeScreenEvent.OnFabClicked -> sendEffect(HomeScreenUIEffect.NavigateToCreateScreen)
-            is HomeScreenEvent.OnItemClicked -> sendEffect(HomeScreenUIEffect.NavigateToDetailScreen(event.item))
+            is HomeScreenUIEvent.OnFabClicked -> sendEffect(HomeScreenUIEffect.NavigateToCreateScreen)
+            is HomeScreenUIEvent.OnItemClicked -> sendEffect(HomeScreenUIEffect.NavigateToDetailScreen(event.item))
+            is HomeScreenUIEvent.OnBalloonShown -> setBalloonState()
         }
     }
 
@@ -59,17 +61,14 @@ class HomeScreenViewModel @Inject constructor(
             getCreatedReelsUseCase.invoke().collect { response ->
                 when (response) {
                     is Response.Loading -> _state.value = HomeScreenUIState.Loading
-                    is Response.Success -> _state.value =
-                        HomeScreenUIState.Success(response.data, showBalloon = balloonState.value)
-
-                    is Response.Error -> _state.value =
-                        HomeScreenUIState.Error(response.errorMessage)
+                    is Response.Success -> _state.value = HomeScreenUIState.Success(response.data)
+                    is Response.Error -> _state.value = HomeScreenUIState.Error(response.errorMessage)
                 }
             }
         }
     }
 
-    private fun setBalloonState(state: Boolean) {
+    private fun setBalloonState(state: Boolean = true) {
         viewModelScope.launch(Dispatchers.IO) {
             setBalloonStateUseCase.invoke(state)
         }
@@ -78,7 +77,7 @@ class HomeScreenViewModel @Inject constructor(
     private fun getBalloonState() {
         viewModelScope.launch(Dispatchers.IO) {
             getBalloonStateUseCase.invoke().collect { state ->
-                balloonState.value = state
+                _balloonState.value = state
             }
         }
     }

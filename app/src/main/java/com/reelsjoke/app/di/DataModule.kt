@@ -29,7 +29,7 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideSatelliteDao(appDatabase: AppDatabase): ReelsDao =
+    fun provideReelsDao(appDatabase: AppDatabase): ReelsDao =
         appDatabase.reelsDao()
 
     @Provides

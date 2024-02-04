@@ -9,6 +9,6 @@ import com.reelsjoke.app.domain.model.ScreenInfo
 
 sealed class HomeScreenUIState {
     data object Loading : HomeScreenUIState()
-    data class Success(val data: List<ScreenInfo>?, val showBalloon: Boolean = false) : HomeScreenUIState()
+    data class Success(val data: List<ScreenInfo>?) : HomeScreenUIState()
     data class Error(val error: String?) : HomeScreenUIState()
 }

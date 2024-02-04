@@ -7,7 +7,7 @@ import com.reelsjoke.app.domain.model.ScreenInfo
  * Created by bedirhansaricayir on 3.02.2024.
  */
 
-sealed class HomeScreenUIEffect {
-    data object NavigateToCreateScreen: HomeScreenUIEffect()
-    data class NavigateToDetailScreen(val item: ScreenInfo): HomeScreenUIEffect()
+sealed interface HomeScreenUIEffect {
+    data object NavigateToCreateScreen : HomeScreenUIEffect
+    data class NavigateToDetailScreen(val item: ScreenInfo) : HomeScreenUIEffect
 }

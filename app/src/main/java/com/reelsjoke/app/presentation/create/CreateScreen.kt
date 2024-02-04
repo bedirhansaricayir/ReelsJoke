@@ -4,14 +4,12 @@ package com.reelsjoke.app.presentation.create
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,7 +21,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -40,6 +37,8 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -69,46 +68,28 @@ import com.reelsjoke.app.core.extensions.noRippleClickable
 import com.reelsjoke.app.core.extensions.toBitmap
 import com.reelsjoke.app.core.util.UriUtility.getUriForFile
 import com.reelsjoke.app.domain.model.QuestionType
-import com.reelsjoke.app.domain.model.ScreenInfo
 
 @Composable
 fun CreateScreen(
     state: CreateScreenUIState,
-    onEvent: (CreateScreenEvent) -> Unit,
-    onExportClick: (ScreenInfo) -> Unit,
-    navigateUp: () -> Unit
+    snackbarHostState: SnackbarHostState,
+    onEvent: (CreateScreenUIEvent) -> Unit
 ) {
     CreateScreenContent(
         state = state,
-        onEvent = onEvent,
-        onExportClick = onExportClick,
-        navigateUp = navigateUp
+        snackbarHostState = snackbarHostState,
+        onEvent = onEvent
     )
 }
 
 @Composable
 fun CreateScreenContent(
     state: CreateScreenUIState,
-    onEvent: (CreateScreenEvent) -> Unit,
-    onExportClick: (ScreenInfo) -> Unit,
-    navigateUp: () -> Unit,
+    snackbarHostState: SnackbarHostState,
+    onEvent: (CreateScreenUIEvent) -> Unit
 ) {
     var infiniteRepeatable by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
-    var backgroundImage by remember { mutableStateOf<Bitmap?>(null) }
-    var isLiked by remember { mutableStateOf(false) }
-    var likesCount by remember { mutableStateOf("") }
-    var commentCount by remember { mutableStateOf("") }
-    var sendCount by remember { mutableStateOf("") }
-    var userImage by remember { mutableStateOf<Bitmap?>(null) }
-    var username by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var isFollowed by remember { mutableStateOf(false) }
-    var isLikesCountHidden by remember { mutableStateOf(true) }
-    var isTaggedPeople by remember { mutableStateOf(false) }
-    var peopleTagged by remember { mutableStateOf("") }
-    var isLocationExist by remember { mutableStateOf(false) }
-    var location by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier
@@ -124,28 +105,10 @@ fun CreateScreenContent(
         ) {
 
             TopBar(
-                navigateUp = navigateUp,
+                navigateUp = { onEvent(CreateScreenUIEvent.OnBackButtonClicked) },
                 onButtonClick = {
                     infiniteRepeatable = !infiniteRepeatable
-                    val screenInfo = ScreenInfo(
-                            description = description,
-                            isLiked = isLiked,
-                            likes = if (isLikesCountHidden) "Likes" else likesCount,
-                            commentCount = commentCount,
-                            send = sendCount,
-                            taggedPeople = peopleTagged,
-                            location = location,
-                            backgroundImage = backgroundImage,
-                            soundImage = userImage,
-                            userImage = userImage,
-                            userTitle = username,
-                            isUserFollowed = isFollowed
-                        )
-                    onEvent(CreateScreenEvent.OnExportClicked(screenInfo))
-                   /* if (screenInfo.isValid(isLikesCountHidden,isTaggedPeople, isLocationExist)) {
-                        onEvent(CreateScreenEvent.OnExportClicked(screenInfo))
-                        onExportClick(screenInfo)
-                    }*/
+                    onEvent(CreateScreenUIEvent.OnExportClicked)
                     infiniteRepeatable = !infiniteRepeatable
                 },
                 infiniteRepeatable = infiniteRepeatable
@@ -153,38 +116,44 @@ fun CreateScreenContent(
 
             BackgroundImage(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                onImageChanged = { backgroundImage = it }
+                onImageChanged = { onEvent(CreateScreenUIEvent.OnBackgroundImageChanged(it)) }
             )
             ReelsDetail(
-                likesCount = likesCount,
-                commentCount = commentCount,
-                sendCount = sendCount,
-                isLiked = isLiked,
-                isLikesCountHidden = isLikesCountHidden,
-                isTaggedPeople = isTaggedPeople,
-                peopleTagged = peopleTagged,
-                isLocationExist = isLocationExist,
-                location = location,
-                isLikedChanged = { isLiked = it },
-                onLikesCountChanged = { likesCount = it },
-                onCommentCountChanged = { commentCount = it },
-                onSendCountChanged = { sendCount = it },
-                onLikesCountHiddenChanged = { isLikesCountHidden = it },
-                onIsTaggedPeopleChanged = { isTaggedPeople = it },
-                onPeopleTaggedChanged = { peopleTagged = it },
-                onIsLocationExistChanged = { isLocationExist = it },
-                onLocationChanged = { location = it }
+                likesCount = state.likesCount,
+                commentCount = state.commentCount,
+                sendCount = state.sendCount,
+                isLiked = state.isLiked,
+                isLikesCountHidden = state.isLikesCountHidden,
+                isTaggedPeople = state.isTaggedPeople,
+                peopleTagged = state.peopleTagged,
+                isLocationExist = state.isLocationExist,
+                location = state.location,
+                isLikedChanged = { onEvent(CreateScreenUIEvent.OnIsLikedChanged(it)) },
+                onLikesCountChanged = { onEvent(CreateScreenUIEvent.OnLikesCountChanged(it)) },
+                onCommentCountChanged = { onEvent(CreateScreenUIEvent.OnCommentCountChanged(it)) },
+                onSendCountChanged = { onEvent(CreateScreenUIEvent.OnSendCountChanged(it)) },
+                onLikesCountHiddenChanged = { onEvent(CreateScreenUIEvent.OnIsLikesCountHiddenChanged(it)) },
+                onIsTaggedPeopleChanged = { onEvent(CreateScreenUIEvent.OnIsTaggedPeopleChanged(it)) },
+                onPeopleTaggedChanged = { onEvent(CreateScreenUIEvent.OnPeopleTaggedChanged(it)) },
+                onIsLocationExistChanged = { onEvent(CreateScreenUIEvent.OnIsLocationExistChanged(it)) },
+                onLocationChanged = { onEvent(CreateScreenUIEvent.OnLocationChanged(it)) }
             )
             UserDetail(
-                onImageChanged = { userImage = it },
-                username = username,
-                description = description,
-                isFollowed = isFollowed,
-                onUsernameChanged = { username = it },
-                onDescriptionChanged = { description = it },
-                onIsFollowedChanged = { isFollowed = it }
+                onImageChanged = { onEvent(CreateScreenUIEvent.OnUserImageChanged(it)) },
+                username = state.username,
+                description = state.description,
+                isFollowed = state.isFollowed,
+                onUsernameChanged = { onEvent(CreateScreenUIEvent.OnUsernameChanged(it)) },
+                onDescriptionChanged = { onEvent(CreateScreenUIEvent.OnDescriptionChanged(it)) },
+                onIsFollowedChanged = { onEvent(CreateScreenUIEvent.OnIsFollowedChanged(it)) }
             )
         }
+
+        SnackbarHost(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            hostState = snackbarHostState,
+        )
+
     }
 }
 

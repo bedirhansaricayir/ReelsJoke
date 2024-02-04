@@ -24,10 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,10 +48,12 @@ import com.reelsjoke.app.domain.model.ScreenInfo
 @Composable
 fun HomeScreen(
     homeUIState: HomeScreenUIState,
-    onEvent: (HomeScreenEvent) -> Unit,
+    balloonState: Boolean,
+    onEvent: (HomeScreenUIEvent) -> Unit,
 ) {
     HomeScreenContent(
         homeUIState = homeUIState,
+        balloonState = balloonState,
         onEvent = onEvent,
     )
 }
@@ -63,15 +61,19 @@ fun HomeScreen(
 @Composable
 fun HomeScreenContent(
     homeUIState: HomeScreenUIState,
-    onEvent: (HomeScreenEvent) -> Unit,
+    balloonState: Boolean,
+    onEvent: (HomeScreenUIEvent) -> Unit,
 ) {
-    var balloonState by remember { mutableStateOf(false) }
+
     Scaffold(
         floatingActionButton = {
             FloatingButtonWithBalloon(
                 showBalloon = balloonState
             ) {
-                onEvent(HomeScreenEvent.OnFabClicked)
+                onEvent(HomeScreenUIEvent.OnFabClicked)
+                if (!balloonState) {
+                    onEvent(HomeScreenUIEvent.OnBalloonShown)
+                }
             }
         }
     ) { paddingValues ->
@@ -87,10 +89,9 @@ fun HomeScreenContent(
                     HomeScreen(
                         data = homeUIState.data.orEmpty(),
                         onClick = { item ->
-                            onEvent(HomeScreenEvent.OnItemClicked(item))
+                            onEvent(HomeScreenUIEvent.OnItemClicked(item))
                         }
                     )
-                    balloonState = homeUIState.showBalloon
                 }
 
 
