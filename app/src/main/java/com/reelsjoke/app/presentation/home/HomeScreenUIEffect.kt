@@ -10,4 +10,5 @@ import com.reelsjoke.app.domain.model.ScreenInfo
 sealed interface HomeScreenUIEffect {
     data object NavigateToCreateScreen : HomeScreenUIEffect
     data class NavigateToDetailScreen(val item: ScreenInfo) : HomeScreenUIEffect
+    data object NavigateToSettingsScreen : HomeScreenUIEffect
 }

@@ -47,6 +47,7 @@ class HomeScreenViewModel @Inject constructor(
             is HomeScreenUIEvent.OnFabClicked -> sendEffect(HomeScreenUIEffect.NavigateToCreateScreen)
             is HomeScreenUIEvent.OnItemClicked -> sendEffect(HomeScreenUIEffect.NavigateToDetailScreen(event.item))
             is HomeScreenUIEvent.OnBalloonShown -> setBalloonState()
+            is HomeScreenUIEvent.OnSettingsClicked -> sendEffect(HomeScreenUIEffect.NavigateToSettingsScreen)
         }
     }
 

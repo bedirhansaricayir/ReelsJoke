@@ -25,6 +25,7 @@ import com.reelsjoke.app.presentation.detail.DetailScreen
 import com.reelsjoke.app.presentation.home.HomeScreen
 import com.reelsjoke.app.presentation.home.HomeScreenUIEffect
 import com.reelsjoke.app.presentation.home.HomeScreenViewModel
+import com.reelsjoke.app.presentation.settings.SettingsScreen
 import com.reelsjoke.app.theme.AppTheme
 import kotlinx.coroutines.launch
 
@@ -39,6 +40,7 @@ fun ReelsJokeApp() {
         val popBackStack: () -> Unit = { navController.popBackStack() }
         val navigateToCreate: () -> Unit = { navController.navigate(Screen.CreateScreen.route) }
         val navigateToDetail: () -> Unit = { navController.navigate(Screen.DetailScreen.route) }
+        val navigateToSettings: () -> Unit = { navController.navigate(Screen.SettingsScreen.route)}
         val setSavedState: (ScreenInfo) -> Unit =
             { navController.currentBackStackEntry?.savedStateHandle?.set("screenInfo", it) }
         val getSavedState: () -> ScreenInfo? =
@@ -71,6 +73,7 @@ fun ReelsJokeApp() {
                                     navigateToDetail()
                                 }
                             }
+                            is HomeScreenUIEffect.NavigateToSettingsScreen -> navigateToSettings()
                         }
                     }
                 }
@@ -122,6 +125,9 @@ fun ReelsJokeApp() {
             composable(route = Screen.DetailScreen.route) {
                 DetailScreen(screenInfo = getSavedState())
             }
+            composable(route = Screen.SettingsScreen.route) {
+                SettingsScreen()
+            }
         }
     }
 }
@@ -139,4 +145,5 @@ sealed class Screen(
     object HomeScreen : Screen("home_screen")
     object CreateScreen : Screen("create_screen")
     object DetailScreen : Screen("detail_screen")
+    object SettingsScreen : Screen("settings_screen")
 }

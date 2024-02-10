@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -39,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.reelsjoke.app.R
 import com.reelsjoke.app.core.components.BalloonComponent
+import com.reelsjoke.app.core.extensions.bouncingClickable
 import com.reelsjoke.app.core.extensions.noRippleClickable
 import com.reelsjoke.app.domain.model.ScreenInfo
 
@@ -90,8 +93,11 @@ fun HomeScreenContent(
                 is HomeScreenUIState.Success -> {
                     HomeScreen(
                         data = homeUIState.data.orEmpty(),
-                        onClick = { item ->
+                        onItemClicked = { item ->
                             onEvent(HomeScreenUIEvent.OnItemClicked(item))
+                        },
+                        onSettingsClicked = {
+                            onEvent(HomeScreenUIEvent.OnSettingsClicked)
                         }
                     )
                 }
@@ -107,7 +113,8 @@ fun HomeScreenContent(
 @Composable
 fun HomeScreen(
     data: List<ScreenInfo>?,
-    onClick: (ScreenInfo) -> Unit
+    onItemClicked: (ScreenInfo) -> Unit,
+    onSettingsClicked: () -> Unit
 ) {
     if (data?.isEmpty() == true) EmptyHomeScreen()
     else {
@@ -116,12 +123,9 @@ fun HomeScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            Text(
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp),
-                text = "Reels",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
+            HomeScreenTopBar(
+                title = "Reels",
+                onClick = onSettingsClicked
             )
             LazyVerticalGrid(
                 modifier = Modifier
@@ -134,13 +138,45 @@ fun HomeScreen(
                 items(data.orEmpty()) { screenInfo ->
                     HomeScreenItem(
                         screenInfo = screenInfo,
-                        onClick = onClick
+                        onClick = onItemClicked
                     )
                 }
             }
         }
     }
+}
 
+@Composable
+fun HomeScreenTopBar(
+    modifier: Modifier = Modifier,
+    title: String,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier,
+            text = title,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        Icon(
+            modifier = Modifier
+                .size(32.dp)
+                .padding(end = 8.dp)
+                .bouncingClickable(onClick = onClick),
+            painter = painterResource(id = R.drawable.ic_settings),
+            contentDescription = "Settings Icon",
+            tint = MaterialTheme.colorScheme.onBackground
+        )
+    }
 }
 
 @Composable

@@ -11,4 +11,5 @@ sealed interface HomeScreenUIEvent {
     data object OnFabClicked : HomeScreenUIEvent
     data class OnItemClicked(val item: ScreenInfo) : HomeScreenUIEvent
     data object OnBalloonShown : HomeScreenUIEvent
+    data object OnSettingsClicked : HomeScreenUIEvent
 }

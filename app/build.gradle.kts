@@ -88,4 +88,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
 
     implementation("com.github.skydoves:balloon-compose:1.6.4")
+
+    implementation("androidx.core:core-splashscreen:1.0.1")
 }
