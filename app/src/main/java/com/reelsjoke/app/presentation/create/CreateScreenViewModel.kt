@@ -9,6 +9,7 @@ import com.reelsjoke.app.domain.usecase.InsertReelsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -62,11 +63,25 @@ class CreateScreenViewModel @Inject constructor(
 
 
     private fun exportClicked() {
-        val screenInfo = createSnapshotModel()
-        if (screenInfo.isValid()) {
-            insertReels(screenInfo)
-            sendEffect(CreateScreenUIEffect.NavigateToDetailScreen(screenInfo))
-        } else sendEffect(CreateScreenUIEffect.ErrorEffect(handleScreenInfoError(screenInfo)))
+        viewModelScope.launch {
+            val screenInfo = createSnapshotModel()
+            if (screenInfo.isValid()) {
+                fakeDelayToAnimation()
+                insertReels(screenInfo)
+                sendEffect(CreateScreenUIEffect.NavigateToDetailScreen(screenInfo))
+            } else sendEffect(CreateScreenUIEffect.ErrorEffect(handleScreenInfoError(screenInfo)))
+        }
+
+    }
+
+    private suspend fun fakeDelayToAnimation(timeMillis: Long = 1000) {
+        _state.update { state ->
+            state.copy(infiniteRepeatable = true)
+        }
+        delay(timeMillis)
+        _state.update { state ->
+            state.copy(infiniteRepeatable = false)
+        }
     }
 
     private fun createSnapshotModel(): ScreenInfo {

@@ -8,6 +8,7 @@ import android.graphics.Bitmap
  */
 data class CreateScreenUIState(
     val isLoading: Boolean = false,
+    val infiniteRepeatable: Boolean = false,
     val backgroundImage: Bitmap? = null,
     val isLiked: Boolean = false,
     val likesCount: String = "",

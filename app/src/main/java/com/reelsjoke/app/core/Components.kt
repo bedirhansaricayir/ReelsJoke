@@ -17,6 +17,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -120,7 +121,7 @@ fun CustomInputField(
 fun RoundedCornerBox(
     modifier: Modifier = Modifier,
     borderStroke: Dp = 1.dp,
-    borderColor: Color = Color.Black,
+    borderColor: Color = MaterialTheme.colorScheme.onBackground,
     borderShape: Dp = 8.dp,
     content: @Composable () -> Unit
 ) {

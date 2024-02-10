@@ -10,7 +10,9 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +39,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -88,12 +91,12 @@ fun CreateScreenContent(
     snackbarHostState: SnackbarHostState,
     onEvent: (CreateScreenUIEvent) -> Unit
 ) {
-    var infiniteRepeatable by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(8.dp)
             .systemBarsPadding()
     ) {
@@ -106,12 +109,8 @@ fun CreateScreenContent(
 
             TopBar(
                 navigateUp = { onEvent(CreateScreenUIEvent.OnBackButtonClicked) },
-                onButtonClick = {
-                    infiniteRepeatable = !infiniteRepeatable
-                    onEvent(CreateScreenUIEvent.OnExportClicked)
-                    infiniteRepeatable = !infiniteRepeatable
-                },
-                infiniteRepeatable = infiniteRepeatable
+                onButtonClick = { onEvent(CreateScreenUIEvent.OnExportClicked) },
+                infiniteRepeatable = state.infiniteRepeatable
             )
 
             BackgroundImage(
@@ -174,7 +173,8 @@ fun TopBar(
         Icon(
             modifier = Modifier.noRippleClickable { navigateUp() },
             imageVector = Icons.Default.ArrowBack,
-            contentDescription = "Back Button"
+            contentDescription = "Back Button",
+            tint = MaterialTheme.colorScheme.onBackground
         )
         ExportButton(onClick = onButtonClick, infiniteRepeatable = infiniteRepeatable)
     }
@@ -238,7 +238,7 @@ fun BackgroundImage(
             .height(200.dp)
             .width(150.dp)
             .border(
-                BorderStroke(1.dp, Color.Black),
+                BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
                 shape = RoundedCornerShape(8.dp)
             )
             .noRippleClickable { showChooseDialog = true },
@@ -257,7 +257,7 @@ fun BackgroundImage(
                     .padding(8.dp),
                 text = "Background Image",
                 fontSize = 12.sp,
-                color = Color.DarkGray
+                color = if (isSystemInDarkTheme()) Color.Gray else Color.DarkGray
             )
         } else
             AsyncImage(
@@ -484,7 +484,7 @@ fun UserDetail(
                         modifier = modifier
                             .size(100.dp)
                             .border(
-                                BorderStroke(1.dp, Color.Black),
+                                BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
                                 shape = RoundedCornerShape(8.dp)
                             )
                             .noRippleClickable { showChooseDialog = true },
@@ -503,7 +503,7 @@ fun UserDetail(
                                     .padding(8.dp),
                                 text = "User Image",
                                 fontSize = 12.sp,
-                                color = Color.DarkGray
+                                color = if (isSystemInDarkTheme()) Color.Gray else Color.DarkGray
                             )
                         } else
                             AsyncImage(
@@ -561,14 +561,15 @@ fun CornerBoxTitleSection(
     ) {
         Text(
             text = title,
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 14.sp,
             fontWeight = FontWeight.W600
         )
         IconButton(onClick = { onClick(!isExpanded) }) {
             Icon(
                 imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = "Expand Button"
+                contentDescription = "Expand Button",
+                tint = MaterialTheme.colorScheme.onBackground
             )
         }
     }
@@ -591,7 +592,7 @@ fun QuestionWithCheckbox(
         ) {
             Text(
                 text = questionType.question,
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.W500
             )
@@ -613,17 +614,19 @@ fun ImageChooseDialog(
     onGalleryClick: () -> Unit,
 ) {
     AlertDialog(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.background)
+            .padding(16.dp),
         onDismissRequest = onDismiss
     ) {
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Text(
                 text = "Choose",
                 fontSize = 18.sp,
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .padding(16.dp)
                     .align(Alignment.Start)
@@ -646,9 +649,13 @@ fun ImageChooseDialog(
                             },
                         painter = painterResource(id = R.drawable.ic_camera),
                         contentDescription = "Camera",
-                        tint = Color.DarkGray
+                        tint = if (isSystemInDarkTheme()) Color.Gray else Color.DarkGray
                     )
-                    Text(text = "Camera", fontSize = 14.sp, color = Color.Gray)
+                    Text(
+                        text = "Camera",
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) Color.Gray else Color.DarkGray
+                    )
                 }
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -664,9 +671,13 @@ fun ImageChooseDialog(
                             },
                         painter = painterResource(id = R.drawable.ic_gallery),
                         contentDescription = "Gallery",
-                        tint = Color.DarkGray
+                        tint = if (isSystemInDarkTheme()) Color.Gray else Color.DarkGray
                     )
-                    Text(text = "Gallery", fontSize = 14.sp, color = Color.Gray)
+                    Text(
+                        text = "Gallery",
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) Color.Gray else Color.DarkGray
+                    )
                 }
             }
             TextButton(
@@ -679,7 +690,7 @@ fun ImageChooseDialog(
                 Text(
                     text = "CANCEL",
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = if (isSystemInDarkTheme()) Color.Gray else Color.DarkGray
                 )
             }
 
