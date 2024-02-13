@@ -39,7 +39,7 @@ fun ExportButton(
 ) {
     Button(
         modifier = Modifier
-            .animatedBorder(shape = CircleShape, infiniteRepeatable = infiniteRepeatable)
+            .animatedBorder(infiniteRepeatable = infiniteRepeatable)
             .height(40.dp)
             .width(100.dp),
         shape = CircleShape,
