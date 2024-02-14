@@ -2,6 +2,7 @@ package com.reelsjoke.app.core.util
 
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
@@ -27,6 +28,24 @@ import java.util.Objects
 /**
  * Created by bedirhansaricayir on 28.01.2024.
  */
+
+
+object IntentUtility {
+    private const val message =
+        "\nYou should definitely try this app\n\n" + "https://play.google.com/store/apps/details?id=com.lifting.app"
+
+    fun shareAppIntent() = Intent().apply {
+        action = Intent.ACTION_SEND
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TITLE, "ReelsJoke")
+        putExtra(Intent.EXTRA_TEXT, message)
+    }
+
+    fun sendMailIntent() = Intent().apply {
+        action = Intent.ACTION_SENDTO
+        data = Uri.parse("mailto:liftingapplication@gmail.com")
+    }
+}
 
 object UriUtility {
     fun getUriForFile(context: Context): Uri {

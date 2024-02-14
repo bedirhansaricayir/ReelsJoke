@@ -3,6 +3,7 @@ package com.reelsjoke.app.core.extensions
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import android.view.Window
 import java.io.File
 import java.text.SimpleDateFormat
@@ -12,6 +13,16 @@ import java.util.Date
 /**
  * Created by bedirhansaricayir on 28.01.2024.
  */
+
+
+fun Context.runIntent(intent: Intent) {
+    when (intent.action) {
+        Intent.ACTION_SENDTO, Intent.ACTION_SEND ->
+            startActivity(Intent.createChooser(intent, "ReelsJoke"))
+
+        else -> startActivity(intent)
+    }
+}
 
 fun Context.createImageFile(): File {
     val timestamp = SimpleDateFormat("yyyy_MM_dd_HH:mm:ss").format(Date())

@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">ReelsJoke</string>
+
+
+    //Settings screen text
+    <string name="email_icon_content_description">Send Feedback</string>
+    <string name="send_feedback_title">Send Feedback</string>
+    <string name="share_icon_content_description">Share ReelsJoke</string>
+    <string name="share_title">Share ReelsJoke to a Friend</string>
+    <string name="privacy_icon_content_description">Privacy Policy</string>
+    <string name="privacy_policy_title">Privacy Policy</string>
+    <string name="terms_icon_content_description">Terms of Use</string>
+    <string name="terms_of_use_title">Terms of Use</string>
+    <string name="settings_screen_title">Settings</string>
+
 </resources>

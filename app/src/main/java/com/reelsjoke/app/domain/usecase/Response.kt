@@ -10,3 +10,7 @@ sealed interface Response<out T> {
     class Error<T>(val errorMessage: String) : Response<T>
     object Loading : Response<Nothing>
 }
+
+fun <T> Response<T>.successOr(fallback: T): T {
+    return (this as? Response.Success<T>)?.data ?: fallback
+}

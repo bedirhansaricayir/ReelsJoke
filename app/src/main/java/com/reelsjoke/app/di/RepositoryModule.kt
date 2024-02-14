@@ -1,7 +1,9 @@
 package com.reelsjoke.app.di
 
 import com.reelsjoke.app.data.repository.ReelsRepositoryImpl
+import com.reelsjoke.app.data.repository.SettingsRepositoryImpl
 import com.reelsjoke.app.domain.repository.ReelsRepository
+import com.reelsjoke.app.domain.repository.SettingsRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -18,4 +20,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideReelsRepository(reelsRepositoryImpl: ReelsRepositoryImpl): ReelsRepository
+
+    @Binds
+    abstract fun provideSettingsRepository(settingsRepositoryImpl: SettingsRepositoryImpl): SettingsRepository
 }
