@@ -8,21 +8,15 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.DialogWindowProvider
-import androidx.core.content.FileProvider
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.reelsjoke.app.core.extensions.createImageFile
-import com.reelsjoke.app.core.extensions.findActivity
 import com.reelsjoke.app.core.extensions.findWindow
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
-import java.util.Objects
 
 
 /**
@@ -47,16 +41,6 @@ object IntentUtility {
     }
 }
 
-object UriUtility {
-    fun getUriForFile(context: Context): Uri {
-        val file = context.createImageFile()
-        return FileProvider.getUriForFile(
-            Objects.requireNonNull(context),
-            context.packageName + ".provider", file
-        )
-    }
-}
-
 object SystemBarUtility {
     @Composable
     fun SetSystemUIController(hide: Boolean) {
@@ -77,30 +61,6 @@ object SystemBarUtility {
                     WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
 
 
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun HideSystemBars() {
-        val context = LocalContext.current
-        DisposableEffect(Unit) {
-            val window = context.findActivity()?.window ?: return@DisposableEffect onDispose {}
-            val insetsController = WindowCompat.getInsetsController(window, window.decorView)
-
-            insetsController.apply {
-                hide(WindowInsetsCompat.Type.statusBars())
-                hide(WindowInsetsCompat.Type.navigationBars())
-                systemBarsBehavior =
-                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            }
-
-            onDispose {
-                insetsController.apply {
-                    show(WindowInsetsCompat.Type.statusBars())
-                    show(WindowInsetsCompat.Type.navigationBars())
-                    systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
                 }
             }
         }

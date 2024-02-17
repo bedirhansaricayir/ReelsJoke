@@ -4,10 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.net.Uri
 import android.view.Window
+import androidx.core.content.FileProvider
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Objects
 
 
 /**
@@ -22,6 +25,14 @@ fun Context.runIntent(intent: Intent) {
 
         else -> startActivity(intent)
     }
+}
+
+fun Context.getUriForFile(): Uri {
+    val file = this.createImageFile()
+    return FileProvider.getUriForFile(
+        Objects.requireNonNull(this),
+        this.packageName + ".provider", file
+    )
 }
 
 fun Context.createImageFile(): File {

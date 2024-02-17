@@ -67,9 +67,9 @@ import com.reelsjoke.app.R
 import com.reelsjoke.app.core.CustomInputField
 import com.reelsjoke.app.core.ExportButton
 import com.reelsjoke.app.core.RoundedCornerBox
+import com.reelsjoke.app.core.extensions.getUriForFile
 import com.reelsjoke.app.core.extensions.noRippleClickable
 import com.reelsjoke.app.core.extensions.toBitmap
-import com.reelsjoke.app.core.util.UriUtility.getUriForFile
 import com.reelsjoke.app.domain.model.QuestionType
 
 @Composable
@@ -199,7 +199,7 @@ fun BackgroundImage(
             bitmap = uri?.toBitmap(context)
         }
     )
-    val uri = getUriForFile(context)
+    val uri = context.getUriForFile()
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
         onResult = {
@@ -425,7 +425,7 @@ fun UserDetail(
             bitmap = uri?.toBitmap(context)
         }
     )
-    val uri = getUriForFile(context)
+    val uri = context.getUriForFile()
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),

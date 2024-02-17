@@ -1,11 +1,9 @@
 package com.reelsjoke.app.presentation.settings
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.reelsjoke.app.domain.usecase.GetSettingsUseCase
 import com.reelsjoke.app.domain.usecase.successOr
-import com.reelsjoke.app.presentation.home.HomeScreenUIEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
