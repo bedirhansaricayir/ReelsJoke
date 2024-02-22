@@ -101,8 +101,6 @@ fun HomeScreenContent(
                         }
                     )
                 }
-
-
                 is HomeScreenUIState.Loading -> LoadingScreen()
             }
         }
@@ -116,33 +114,74 @@ fun HomeScreen(
     onItemClicked: (ScreenInfo) -> Unit,
     onSettingsClicked: () -> Unit
 ) {
-    if (data?.isEmpty() == true) EmptyHomeScreen()
-    else {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            HomeScreenTopBar(
-                title = "Reels",
-                onClick = onSettingsClicked
-            )
-            LazyVerticalGrid(
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        if (data?.isEmpty() == true) EmptyHomeScreen(onClick = onSettingsClicked)
+        else {
+            Column(
                 modifier = Modifier
-                    .fillMaxSize(),
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
             ) {
-                items(data.orEmpty()) { screenInfo ->
-                    HomeScreenItem(
-                        screenInfo = screenInfo,
-                        onClick = onItemClicked
-                    )
+                HomeScreenTopBar(
+                    title = "Reels",
+                    onClick = onSettingsClicked
+                )
+                LazyVerticalGrid(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(data.orEmpty()) { screenInfo ->
+                        HomeScreenItem(
+                            screenInfo = screenInfo,
+                            onClick = onItemClicked
+                        )
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun EmptyHomeScreen(
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                modifier = Modifier.size(80.dp),
+                painter = painterResource(id = R.drawable.reels_icon),
+                contentDescription = "Reels Icon",
+                colorFilter = ColorFilter.tint(color = Color.Gray)
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "No content here yet",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color.Gray
+            )
+        }
+        SettingsButton(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(vertical = 16.dp, horizontal = 8.dp),
+            onClick = onClick
+        )
     }
 }
 
@@ -166,40 +205,26 @@ fun HomeScreenTopBar(
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground
         )
-
-        Icon(
-            modifier = Modifier
-                .size(32.dp)
-                .padding(end = 8.dp)
-                .bouncingClickable(onClick = onClick),
-            painter = painterResource(id = R.drawable.ic_settings),
-            contentDescription = "Settings Icon",
-            tint = MaterialTheme.colorScheme.onBackground
+        SettingsButton(
+            onClick = onClick
         )
     }
 }
 
 @Composable
-fun EmptyHomeScreen() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            modifier = Modifier.size(80.dp),
-            painter = painterResource(id = R.drawable.reels_icon),
-            contentDescription = "Reels Icon",
-            colorFilter = ColorFilter.tint(color = Color.Gray)
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = "No content here yet",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.Gray
-        )
-    }
+fun SettingsButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Icon(
+        modifier = modifier
+            .size(32.dp)
+            .padding(end = 8.dp)
+            .bouncingClickable(onClick = onClick),
+        painter = painterResource(id = R.drawable.ic_settings),
+        contentDescription = "Settings Icon",
+        tint = MaterialTheme.colorScheme.onBackground
+    )
 }
 
 @Composable
