@@ -90,4 +90,6 @@ dependencies {
     implementation("com.github.skydoves:balloon-compose:1.6.4")
 
     implementation("androidx.core:core-splashscreen:1.0.1")
+
+    implementation("com.android.billingclient:billing-ktx:6.1.0")
 }
