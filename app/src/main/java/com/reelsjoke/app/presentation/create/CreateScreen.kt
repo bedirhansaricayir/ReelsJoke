@@ -109,7 +109,10 @@ fun CreateScreenContent(
 
             TopBar(
                 navigateUp = { onEvent(CreateScreenUIEvent.OnBackButtonClicked) },
-                onButtonClick = { onEvent(CreateScreenUIEvent.OnExportClicked) },
+                onButtonClick = {
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                    onEvent(CreateScreenUIEvent.OnExportClicked)
+                },
                 infiniteRepeatable = state.infiniteRepeatable
             )
 
