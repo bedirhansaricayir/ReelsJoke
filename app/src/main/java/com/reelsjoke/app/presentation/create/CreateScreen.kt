@@ -61,6 +61,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import com.reelsjoke.app.R
@@ -609,17 +610,13 @@ fun QuestionWithCheckbox(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImageChooseDialog(
     onDismiss: () -> Unit,
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit,
 ) {
-    AlertDialog(
-        modifier = Modifier
-            .background(color = MaterialTheme.colorScheme.background)
-            .padding(16.dp),
+    Dialog(
         onDismissRequest = onDismiss
     ) {
         Card(
