@@ -4,7 +4,7 @@
     <style name="Theme.ReelsJoke" parent="android:Theme.Material.Light.NoActionBar" />
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/black</item>
+        <item name="windowSplashScreenBackground">#24a0ed</item>
         <item name="postSplashScreenTheme">@style/Theme.ReelsJoke</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/animated_icon</item>
         <item name="android:animationDuration">1000</item>
