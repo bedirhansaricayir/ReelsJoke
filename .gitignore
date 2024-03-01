@@ -16,4 +16,8 @@
 local.properties
 misc.xml
 deploymentTargetDropDown.xml
+keystore.properties
+/app/release
+
+
 
