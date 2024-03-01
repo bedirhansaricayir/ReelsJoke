@@ -2,6 +2,8 @@ package com.reelsjoke.app.presentation.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.reelsjoke.app.core.Contants.Companion.PRIVACY_POLICY
+import com.reelsjoke.app.core.Contants.Companion.TERMS
 import com.reelsjoke.app.domain.usecase.GetSettingsUseCase
 import com.reelsjoke.app.domain.usecase.successOr
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,6 +43,8 @@ class SettingsScreenViewModel @Inject constructor(
             is SettingsScreenUIEvent.OnBackButtonClicked -> sendEffect(SettingsScreenUIEffect.NavigateToHomeScreen)
             is SettingsScreenUIEvent.OnShareAppClicked -> sendEffect(SettingsScreenUIEffect.RunIntentForShareApp(event.intent))
             is SettingsScreenUIEvent.OnSendFeedbackClicked -> sendEffect(SettingsScreenUIEffect.RunIntentForSendMail(event.intent))
+            is SettingsScreenUIEvent.OnPrivacyPolicyClicked -> sendEffect(SettingsScreenUIEffect.ShowPrivacyPolicy(PRIVACY_POLICY))
+            is SettingsScreenUIEvent.OnTermsClicked -> sendEffect(SettingsScreenUIEffect.ShowTerms(TERMS))
         }
     }
 

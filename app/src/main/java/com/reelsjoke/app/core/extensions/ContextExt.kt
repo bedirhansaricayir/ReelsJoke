@@ -27,6 +27,10 @@ fun Context.runIntent(intent: Intent) {
     }
 }
 
+fun Context.openWeb(url: String) {
+    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+}
+
 fun Context.getUriForFile(): Uri {
     val file = this.createImageFile()
     return FileProvider.getUriForFile(

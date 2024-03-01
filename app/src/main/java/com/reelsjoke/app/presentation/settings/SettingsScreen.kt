@@ -55,6 +55,14 @@ fun SettingsScreen(
                         sendMailIntent()
                     )
                 )
+
+                R.string.privacy_policy_title -> onEvent(
+                    SettingsScreenUIEvent.OnPrivacyPolicyClicked
+                )
+
+                R.string.terms_of_use_title -> onEvent(
+                    SettingsScreenUIEvent.OnTermsClicked
+                )
             }
         }
     )

@@ -6,6 +6,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.reelsjoke.app.core.extensions.openWeb
 import com.reelsjoke.app.core.extensions.runIntent
 import com.reelsjoke.app.navigation.Screen
 import com.reelsjoke.app.presentation.settings.SettingsScreen
@@ -32,6 +33,8 @@ fun NavGraphBuilder.settingsScreen(
                     is SettingsScreenUIEffect.NavigateToHomeScreen -> popBackStack()
                     is SettingsScreenUIEffect.RunIntentForShareApp -> context.runIntent(effect.intent)
                     is SettingsScreenUIEffect.RunIntentForSendMail -> context.runIntent(effect.intent)
+                    is SettingsScreenUIEffect.ShowPrivacyPolicy -> context.openWeb(effect.url)
+                    is SettingsScreenUIEffect.ShowTerms -> context.openWeb(effect.url)
                 }
             }
         }

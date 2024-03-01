@@ -11,5 +11,7 @@ sealed interface SettingsScreenUIEvent {
     data object OnBackButtonClicked : SettingsScreenUIEvent
     data class OnShareAppClicked(val intent: Intent) : SettingsScreenUIEvent
     data class OnSendFeedbackClicked(val intent: Intent) : SettingsScreenUIEvent
+    data object OnPrivacyPolicyClicked : SettingsScreenUIEvent
+    data object OnTermsClicked : SettingsScreenUIEvent
 
 }
