@@ -10,7 +10,7 @@ import java.io.ByteArrayOutputStream
  * Created by bedirhansaricayir on 28.01.2024.
  */
 
-fun Bitmap.toBase64(quality: Int = 100): String {
+fun Bitmap.toBase64(quality: Int = 30): String {
     val baos = ByteArrayOutputStream()
     this.compress(Bitmap.CompressFormat.JPEG, quality, baos)
     val byteArray = baos.toByteArray()

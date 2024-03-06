@@ -2,7 +2,6 @@ package com.reelsjoke.app.data.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlin.random.Random
 
 
 /**
@@ -12,7 +11,7 @@ import kotlin.random.Random
 @Entity(tableName = "ScreenInfo")
 data class ScreenInfoEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = Random.nextInt(),
+    val id: Int = 0,
     val description: String,
     val isLiked: Boolean,
     val likes: String,

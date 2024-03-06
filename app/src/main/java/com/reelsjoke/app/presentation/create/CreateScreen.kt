@@ -1,10 +1,7 @@
 package com.reelsjoke.app.presentation.create
 
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -32,11 +29,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -62,13 +57,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import com.reelsjoke.app.R
 import com.reelsjoke.app.core.CustomInputField
 import com.reelsjoke.app.core.ExportButton
 import com.reelsjoke.app.core.RoundedCornerBox
-import com.reelsjoke.app.core.extensions.getUriForFile
 import com.reelsjoke.app.core.extensions.noRippleClickable
 import com.reelsjoke.app.core.extensions.toBitmap
 import com.reelsjoke.app.domain.model.QuestionType
@@ -189,54 +182,22 @@ fun BackgroundImage(
     modifier: Modifier = Modifier,
     onImageChanged: (Bitmap) -> Unit
 ) {
-    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     val context = LocalContext.current
-    LaunchedEffect(key1 = bitmap) {
-        if (bitmap != null) {
-            onImageChanged(bitmap!!)
+    var capturedImage by remember { mutableStateOf<Bitmap?>(null) }
+
+    LaunchedEffect(key1 = capturedImage) {
+        capturedImage?.let { image ->
+            onImageChanged(image)
         }
     }
-    var showChooseDialog by remember { mutableStateOf(false) }
+
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri ->
-            bitmap = uri?.toBitmap(context)
-        }
-    )
-    val uri = context.getUriForFile()
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(),
-        onResult = {
-            bitmap = uri.toBitmap(context)
-        }
-    )
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = {
-            if (it) {
-                Toast.makeText(context, "Permission Granted.", Toast.LENGTH_SHORT)
-                    .show()
-                cameraLauncher.launch(uri)
-            }
+        onResult = { imageUri ->
+            capturedImage = imageUri?.toBitmap(context)
         }
     )
 
-    if (showChooseDialog) {
-        ImageChooseDialog(
-            onDismiss = { showChooseDialog = false },
-            onCameraClick = {
-                val permissionCheckResult =
-                    ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-                if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) cameraLauncher.launch(
-                    uri
-                )
-                else permissionLauncher.launch(Manifest.permission.CAMERA)
-            },
-            onGalleryClick = {
-                galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-            },
-        )
-    }
     Box(
         modifier = modifier
             .height(200.dp)
@@ -245,10 +206,19 @@ fun BackgroundImage(
                 BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
                 shape = RoundedCornerShape(8.dp)
             )
-            .noRippleClickable { showChooseDialog = true },
+            .noRippleClickable { galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
         contentAlignment = Alignment.Center
     ) {
-        if (bitmap == null) {
+        capturedImage?.let { image ->
+            AsyncImage(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(8.dp)),
+                model = image,
+                contentDescription = "Selected Image",
+                contentScale = ContentScale.Crop,
+            )
+        } ?: run {
             Icon(
                 modifier = Modifier.size(width = 75.dp, height = 100.dp),
                 painter = painterResource(id = R.drawable.ic_gallery),
@@ -263,17 +233,7 @@ fun BackgroundImage(
                 fontSize = 12.sp,
                 color = if (isSystemInDarkTheme()) Color.Gray else Color.DarkGray
             )
-        } else
-            AsyncImage(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(8.dp)),
-                model = bitmap,
-                contentDescription = "Selected Image",
-                contentScale = ContentScale.Crop,
-            )
-
-
+        }
     }
 }
 
@@ -414,55 +374,22 @@ fun UserDetail(
     onDescriptionChanged: (String) -> Unit,
     onIsFollowedChanged: (Boolean) -> Unit
 ) {
-    var isExpanded by remember { mutableStateOf(true) }
-    var showChooseDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
-    LaunchedEffect(key1 = bitmap) {
-        if (bitmap != null) {
-            onImageChanged(bitmap!!)
+    var isExpanded by remember { mutableStateOf(true) }
+    var capturedImage by remember { mutableStateOf<Bitmap?>(null) }
+
+    LaunchedEffect(key1 = capturedImage) {
+        capturedImage?.let { image ->
+            onImageChanged(image)
         }
     }
+
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri ->
-            bitmap = uri?.toBitmap(context)
+        onResult = { imageUri ->
+            capturedImage = imageUri?.toBitmap(context)
         }
     )
-    val uri = context.getUriForFile()
-
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(),
-        onResult = {
-            bitmap = uri.toBitmap(context)
-        }
-    )
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = {
-            if (it) {
-                Toast.makeText(context, "Permission Granted.", Toast.LENGTH_SHORT).show()
-                cameraLauncher.launch(uri)
-            }
-        }
-    )
-
-    if (showChooseDialog) {
-        ImageChooseDialog(
-            onDismiss = { showChooseDialog = false },
-            onCameraClick = {
-                val permissionCheckResult =
-                    ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-                if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) cameraLauncher.launch(
-                    uri
-                )
-                else permissionLauncher.launch(Manifest.permission.CAMERA)
-            },
-            onGalleryClick = {
-                galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-            },
-        )
-    }
 
     RoundedCornerBox(modifier = modifier) {
         CornerBoxTitleSection(
@@ -491,10 +418,19 @@ fun UserDetail(
                                 BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
                                 shape = RoundedCornerShape(8.dp)
                             )
-                            .noRippleClickable { showChooseDialog = true },
+                            .noRippleClickable { galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                         contentAlignment = Alignment.Center
                     ) {
-                        if (bitmap == null) {
+                        capturedImage?.let { image ->
+                            AsyncImage(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(RoundedCornerShape(8.dp)),
+                                model = image,
+                                contentDescription = "Selected Image",
+                                contentScale = ContentScale.Crop,
+                            )
+                        } ?: run {
                             Icon(
                                 modifier = Modifier.size(width = 35.dp, height = 50.dp),
                                 painter = painterResource(id = R.drawable.ic_gallery),
@@ -509,15 +445,7 @@ fun UserDetail(
                                 fontSize = 12.sp,
                                 color = if (isSystemInDarkTheme()) Color.Gray else Color.DarkGray
                             )
-                        } else
-                            AsyncImage(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(RoundedCornerShape(8.dp)),
-                                model = bitmap,
-                                contentDescription = "Selected Image",
-                                contentScale = ContentScale.Crop,
-                            )
+                        }
                     }
 
                     Column {
@@ -645,7 +573,6 @@ fun ImageChooseDialog(
                             .size(32.dp)
                             .noRippleClickable {
                                 onCameraClick.invoke()
-                                onDismiss.invoke()
                             },
                         painter = painterResource(id = R.drawable.ic_camera),
                         contentDescription = "Camera",

@@ -19,4 +19,7 @@ interface ReelsDao {
 
     @Query("SELECT * FROM ScreenInfo")
     fun getCreatedReels(): Flow<List<ScreenInfoEntity>>
+
+    @Query("SELECT * FROM ScreenInfo where id=:id")
+    fun getReelsById(id: Int): ScreenInfoEntity?
 }

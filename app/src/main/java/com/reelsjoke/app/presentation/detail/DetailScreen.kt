@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import coil.compose.AsyncImage
 import com.reelsjoke.app.domain.model.ScreenInfo
+import com.reelsjoke.app.presentation.detail.components.LeftBottomSection
+import com.reelsjoke.app.presentation.detail.components.RightBottomSection
 
 
 /**

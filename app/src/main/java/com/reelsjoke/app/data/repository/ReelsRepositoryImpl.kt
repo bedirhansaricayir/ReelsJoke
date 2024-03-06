@@ -24,4 +24,8 @@ class ReelsRepositoryImpl @Inject constructor(
     override suspend fun insertReels(item: ScreenInfo) {
         item.domainToCache().let { dao.insertReels(it) }
     }
+
+    override suspend fun getReelsById(id: Int): ScreenInfo? {
+        return dao.getReelsById(id)?.cacheToDomain()
+    }
 }

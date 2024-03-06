@@ -1,4 +1,4 @@
-package com.reelsjoke.app.presentation.detail
+package com.reelsjoke.app.presentation.detail.components
 
 import android.graphics.Bitmap
 import androidx.annotation.DrawableRes

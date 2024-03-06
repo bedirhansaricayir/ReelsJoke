@@ -12,4 +12,6 @@ interface ReelsRepository {
     suspend fun getCreatedReels(): Flow<List<ScreenInfo>?>
 
     suspend fun insertReels(item: ScreenInfo)
+
+    suspend fun getReelsById(id: Int): ScreenInfo?
 }
