@@ -12,4 +12,7 @@ sealed interface HomeScreenUIEvent {
     data class OnItemClicked(val item: ScreenInfo) : HomeScreenUIEvent
     data object OnBalloonShown : HomeScreenUIEvent
     data object OnSettingsClicked : HomeScreenUIEvent
+    data object OnReachTheLimit : HomeScreenUIEvent
+    data object OnSuccessBilling : HomeScreenUIEvent
+    data object OnRefreshButtonClicked : HomeScreenUIEvent
 }

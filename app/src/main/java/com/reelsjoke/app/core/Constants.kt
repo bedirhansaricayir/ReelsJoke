@@ -9,5 +9,6 @@ class Contants {
     companion object {
         const val PRIVACY_POLICY = "https://sites.google.com/view/reelsjoke/privacy"
         const val TERMS = "https://sites.google.com/view/reelsjoke/terms"
+        const val BASE_CREATE_COUNT = 3
     }
 }

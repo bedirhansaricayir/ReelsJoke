@@ -41,15 +41,15 @@ fun ExportButton(
         modifier = Modifier
             .animatedBorder(infiniteRepeatable = infiniteRepeatable)
             .height(40.dp)
-            .width(100.dp),
+            .width(120.dp),
         shape = CircleShape,
-        colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background),
         onClick = onClick
     ) {
         Text(
             modifier = Modifier,
             text = if (infiniteRepeatable) "Exporting..." else "Export",
-            color = Color.LightGray,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 10.sp,
             fontStyle = FontStyle.Normal,
             fontWeight = FontWeight.W500

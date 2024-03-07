@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.reelsjoke.app.core.Contants.Companion.PRIVACY_POLICY
 import com.reelsjoke.app.core.Contants.Companion.TERMS
 import com.reelsjoke.app.domain.usecase.GetSettingsUseCase
+import com.reelsjoke.app.domain.usecase.SetPremiumUseCase
 import com.reelsjoke.app.domain.usecase.successOr
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +25,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsScreenViewModel @Inject constructor(
-    private val getSettingsUseCase: GetSettingsUseCase
+    private val getSettingsUseCase: GetSettingsUseCase,
+    private val setPremiumUseCase: SetPremiumUseCase
 ) : ViewModel() {
 
     private val _state: MutableStateFlow<SettingsScreenUIState> =
@@ -40,11 +42,13 @@ class SettingsScreenViewModel @Inject constructor(
 
     fun onEvent(event: SettingsScreenUIEvent) {
         when (event) {
+            is SettingsScreenUIEvent.OnPremiumClicked -> sendEffect(SettingsScreenUIEffect.StartBillingFlow)
             is SettingsScreenUIEvent.OnBackButtonClicked -> sendEffect(SettingsScreenUIEffect.NavigateToHomeScreen)
             is SettingsScreenUIEvent.OnShareAppClicked -> sendEffect(SettingsScreenUIEffect.RunIntentForShareApp(event.intent))
             is SettingsScreenUIEvent.OnSendFeedbackClicked -> sendEffect(SettingsScreenUIEffect.RunIntentForSendMail(event.intent))
             is SettingsScreenUIEvent.OnPrivacyPolicyClicked -> sendEffect(SettingsScreenUIEffect.ShowPrivacyPolicy(PRIVACY_POLICY))
             is SettingsScreenUIEvent.OnTermsClicked -> sendEffect(SettingsScreenUIEffect.ShowTerms(TERMS))
+            is SettingsScreenUIEvent.OnSuccessBilling -> setPremium()
         }
     }
 
@@ -59,6 +63,12 @@ class SettingsScreenViewModel @Inject constructor(
         val settings = settingsDeferred.await().successOr(emptyList())
         _state.update { uiState ->
             uiState.copy(settings = settings)
+        }
+    }
+
+    private fun setPremium(state: Boolean = true) {
+        viewModelScope.launch(Dispatchers.IO) {
+            setPremiumUseCase.invoke(state)
         }
     }
 }

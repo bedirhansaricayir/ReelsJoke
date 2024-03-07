@@ -44,6 +44,10 @@ fun SettingsScreen(
         onBackPress = { onEvent(SettingsScreenUIEvent.OnBackButtonClicked) },
         onItemClicked = { settingsItem ->
             when (settingsItem) {
+                R.string.go_premium_title -> onEvent(
+                    SettingsScreenUIEvent.OnPremiumClicked
+                )
+
                 R.string.share_title -> onEvent(
                     SettingsScreenUIEvent.OnShareAppClicked(
                         shareAppIntent()

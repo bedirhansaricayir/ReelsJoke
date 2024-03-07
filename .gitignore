@@ -18,6 +18,8 @@ misc.xml
 deploymentTargetDropDown.xml
 keystore.properties
 /app/release
+*.jks
+*.pepk
 
 
 

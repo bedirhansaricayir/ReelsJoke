@@ -11,10 +11,15 @@ import javax.inject.Inject
  * Created by bedirhansaricayir on 14.02.2024.
  */
 class SettingsRepositoryImpl @Inject constructor(
-): SettingsRepository {
+) : SettingsRepository {
 
     private val settings by lazy {
         listOf(
+            SettingsItemData(
+                leadingIcon = R.drawable.premium,
+                leadingIconContentDescription = R.string.premium_icon_content_description,
+                title = R.string.go_premium_title
+            ),
             SettingsItemData(
                 leadingIcon = R.drawable.ic_email,
                 leadingIconContentDescription = R.string.email_icon_content_description,

@@ -1,15 +1,20 @@
 package com.reelsjoke.app.navigation.screen
 
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.reelsjoke.app.domain.model.ScreenInfo
 import com.reelsjoke.app.navigation.Screen
-import com.reelsjoke.app.navigation.canGoNavigate
+import com.reelsjoke.app.presentation.components.BillingBottomSheet
 import com.reelsjoke.app.presentation.home.HomeScreen
 import com.reelsjoke.app.presentation.home.HomeScreenUIEffect
+import com.reelsjoke.app.presentation.home.HomeScreenUIEvent
 import com.reelsjoke.app.presentation.home.HomeScreenViewModel
 
 
@@ -26,7 +31,7 @@ fun NavGraphBuilder.homeScreen(
         val viewModel: HomeScreenViewModel = hiltViewModel()
         val homeUIState = viewModel.state.collectAsStateWithLifecycle()
         val homeUIEffect = viewModel.effects
-        val balloonState = viewModel.balloonState.collectAsStateWithLifecycle()
+        var billingFlowEnabled by remember { mutableStateOf(false) }
 
         LaunchedEffect(key1 = homeUIEffect) {
             homeUIEffect.collect { effects ->
@@ -34,13 +39,20 @@ fun NavGraphBuilder.homeScreen(
                     is HomeScreenUIEffect.NavigateToCreateScreen -> navigateToCreate()
                     is HomeScreenUIEffect.NavigateToDetailScreen -> navigateToDetail(effects.item)
                     is HomeScreenUIEffect.NavigateToSettingsScreen -> navigateToSettings()
+                    is HomeScreenUIEffect.StartBillingFlow -> billingFlowEnabled = true
                 }
             }
         }
         HomeScreen(
             homeUIState = homeUIState.value,
-            balloonState = balloonState.value,
             onEvent = viewModel::onEvent,
         )
+
+        BillingBottomSheet(
+            enabled = billingFlowEnabled,
+            onDismiss = { billingFlowEnabled = false },
+            onSuccess = { HomeScreenUIEvent.OnSuccessBilling }
+        )
+
     }
 }

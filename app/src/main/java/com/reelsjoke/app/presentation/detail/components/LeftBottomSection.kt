@@ -127,7 +127,7 @@ fun FollowButton(
     isFollowed: Boolean
 ) {
     Text(
-        text = if (isFollowed) "Takip" else "Takip Et",
+        text = if (isFollowed) "Following" else "Follow",
         color = Color.White,
         modifier = modifier
             .border(

@@ -19,6 +19,10 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,11 +39,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.reelsjoke.app.R
+import com.reelsjoke.app.core.Contants.Companion.BASE_CREATE_COUNT
 import com.reelsjoke.app.core.components.BalloonComponent
 import com.reelsjoke.app.core.extensions.bouncingClickable
 import com.reelsjoke.app.core.extensions.noRippleClickable
@@ -53,12 +59,10 @@ import com.reelsjoke.app.domain.model.ScreenInfo
 @Composable
 fun HomeScreen(
     homeUIState: HomeScreenUIState,
-    balloonState: Boolean,
     onEvent: (HomeScreenUIEvent) -> Unit,
 ) {
     HomeScreenContent(
         homeUIState = homeUIState,
-        balloonState = balloonState,
         onEvent = onEvent,
     )
 }
@@ -66,18 +70,33 @@ fun HomeScreen(
 @Composable
 fun HomeScreenContent(
     homeUIState: HomeScreenUIState,
-    balloonState: Boolean,
     onEvent: (HomeScreenUIEvent) -> Unit,
 ) {
+    when (homeUIState) {
+        is HomeScreenUIState.Error -> ErrorScreen(onClicked = { onEvent(HomeScreenUIEvent.OnRefreshButtonClicked) })
+        is HomeScreenUIState.Success -> HomeScreenWrapper(homeUIState = homeUIState, onEvent = onEvent)
 
+        is HomeScreenUIState.Loading -> LoadingScreen()
+    }
+}
+
+@Composable
+fun HomeScreenWrapper(
+    homeUIState: HomeScreenUIState.Success,
+    onEvent: (HomeScreenUIEvent) -> Unit,
+) {
     Scaffold(
         floatingActionButton = {
             FloatingButtonWithBalloon(
-                showBalloon = balloonState
+                showBalloon = homeUIState.isBalloonShown
             ) {
-                onEvent(HomeScreenUIEvent.OnFabClicked)
-                if (!balloonState) {
+                if (!homeUIState.isBalloonShown) {
                     onEvent(HomeScreenUIEvent.OnBalloonShown)
+                }
+                homeUIState.let { state ->
+                    state.takeIf { !state.isPremium && state.data?.size!! >= BASE_CREATE_COUNT }
+                        ?.run { onEvent(HomeScreenUIEvent.OnReachTheLimit) }
+                        ?: onEvent(HomeScreenUIEvent.OnFabClicked)
                 }
             }
         }
@@ -88,21 +107,15 @@ fun HomeScreenContent(
                 .padding(paddingValues),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            when (homeUIState) {
-                is HomeScreenUIState.Error -> {}
-                is HomeScreenUIState.Success -> {
-                    HomeScreen(
-                        data = homeUIState.data.orEmpty(),
-                        onItemClicked = { item ->
-                            onEvent(HomeScreenUIEvent.OnItemClicked(item))
-                        },
-                        onSettingsClicked = {
-                            onEvent(HomeScreenUIEvent.OnSettingsClicked)
-                        }
-                    )
+            HomeScreen(
+                data = homeUIState.data.orEmpty(),
+                onItemClicked = { item ->
+                    onEvent(HomeScreenUIEvent.OnItemClicked(item))
+                },
+                onSettingsClicked = {
+                    onEvent(HomeScreenUIEvent.OnSettingsClicked)
                 }
-                is HomeScreenUIState.Loading -> LoadingScreen()
-            }
+            )
         }
 
     }
@@ -235,6 +248,47 @@ fun LoadingScreen() {
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun ErrorScreen(
+    onClicked: () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(id = R.string.error_title),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color.Gray
+            )
+            Button(
+                onClick = { onClicked.invoke() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White
+                )
+            ) {
+                Icon(
+                    modifier = Modifier.padding(end = 8.dp),
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = stringResource(id = R.string.refresh_button_title)
+                )
+                Text(
+                    text = stringResource(id = R.string.refresh_button),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold
+                )
+
+            }
+        }
     }
 }
 

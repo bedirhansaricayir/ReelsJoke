@@ -4,13 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.reelsjoke.app.domain.usecase.GetBalloonStateUseCase
 import com.reelsjoke.app.domain.usecase.GetCreatedReelsUseCase
+import com.reelsjoke.app.domain.usecase.GetPremiumStateUseCase
 import com.reelsjoke.app.domain.usecase.Response
 import com.reelsjoke.app.domain.usecase.SetBalloonStateUseCase
+import com.reelsjoke.app.domain.usecase.SetPremiumUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,7 +26,9 @@ import javax.inject.Inject
 class HomeScreenViewModel @Inject constructor(
     private val getCreatedReelsUseCase: GetCreatedReelsUseCase,
     private val getBalloonStateUseCase: GetBalloonStateUseCase,
-    private val setBalloonStateUseCase: SetBalloonStateUseCase
+    private val setBalloonStateUseCase: SetBalloonStateUseCase,
+    private val setPremiumUseCase: SetPremiumUseCase,
+    private val getPremiumStateUseCase: GetPremiumStateUseCase
 ) : ViewModel() {
 
     private val _state: MutableStateFlow<HomeScreenUIState> =
@@ -33,13 +38,9 @@ class HomeScreenViewModel @Inject constructor(
     private val _effects = Channel<HomeScreenUIEffect>()
     val effects = _effects.receiveAsFlow()
 
-    private val _balloonState: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val balloonState = _balloonState.asStateFlow()
-
 
     init {
-        getBalloonState()
-        getCreatedReels()
+        getStateFlow()
     }
 
     fun onEvent(event: HomeScreenUIEvent) {
@@ -48,6 +49,9 @@ class HomeScreenViewModel @Inject constructor(
             is HomeScreenUIEvent.OnItemClicked -> sendEffect(HomeScreenUIEffect.NavigateToDetailScreen(event.item))
             is HomeScreenUIEvent.OnBalloonShown -> setBalloonState()
             is HomeScreenUIEvent.OnSettingsClicked -> sendEffect(HomeScreenUIEffect.NavigateToSettingsScreen)
+            is HomeScreenUIEvent.OnReachTheLimit -> sendEffect(HomeScreenUIEffect.StartBillingFlow)
+            is HomeScreenUIEvent.OnSuccessBilling -> setPremium()
+            is HomeScreenUIEvent.OnRefreshButtonClicked -> getStateFlow()
         }
     }
 
@@ -57,14 +61,28 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    private fun getCreatedReels() {
+    private fun getStateFlow() {
         viewModelScope.launch(Dispatchers.IO) {
-            getCreatedReelsUseCase.invoke().collect { response ->
-                when (response) {
-                    is Response.Loading -> _state.value = HomeScreenUIState.Loading
-                    is Response.Success -> _state.value = HomeScreenUIState.Success(response.data)
-                    is Response.Error -> _state.value = HomeScreenUIState.Error(response.errorMessage)
+            val createdReelsFlow = getCreatedReelsUseCase.invoke()
+            val premiumStateFlow = getPremiumStateUseCase.invoke()
+            val balloonStateFlow = getBalloonStateUseCase.invoke()
+            combine(
+                createdReelsFlow,
+                premiumStateFlow,
+                balloonStateFlow
+            ) { createdReelsResponse, isPremium, isBalloonShown ->
+                when (createdReelsResponse) {
+                    is Response.Loading -> HomeScreenUIState.Loading
+                    is Response.Success -> HomeScreenUIState.Success(
+                        createdReelsResponse.data,
+                        isPremium,
+                        isBalloonShown
+                    )
+
+                    is Response.Error -> HomeScreenUIState.Error(createdReelsResponse.errorMessage)
                 }
+            }.collect { newState ->
+                _state.value = newState
             }
         }
     }
@@ -75,11 +93,9 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    private fun getBalloonState() {
+    private fun setPremium(state: Boolean = true) {
         viewModelScope.launch(Dispatchers.IO) {
-            getBalloonStateUseCase.invoke().collect { state ->
-                _balloonState.value = state
-            }
+            setPremiumUseCase.invoke(state)
         }
     }
 }

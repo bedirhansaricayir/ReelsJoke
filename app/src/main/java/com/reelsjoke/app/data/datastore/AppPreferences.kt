@@ -23,10 +23,11 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "ap
 
 class AppPreferencesImpl @Inject constructor(
     @ApplicationContext val context: Context
-): AppPreferences {
+) : AppPreferences {
 
     private object PreferencesKey {
         val showBalloon = booleanPreferencesKey(name = "show_balloon")
+        val isPremium = booleanPreferencesKey(name = "is_premium")
     }
 
     override suspend fun setBalloonState(state: Boolean) {
@@ -47,6 +48,24 @@ class AppPreferencesImpl @Inject constructor(
             }
     }
 
+    override suspend fun setPremium(state: Boolean) {
+        context.dataStore.edit { pref ->
+            pref[PreferencesKey.isPremium] = state
+        }
+    }
+
+    override fun getPremiumState(): Flow<Boolean> {
+        return context.dataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else
+                    throw exception
+            }.map { pref ->
+                pref[PreferencesKey.isPremium] ?: false
+            }
+    }
+
 
 }
 
@@ -56,4 +75,8 @@ interface AppPreferences {
     suspend fun setBalloonState(state: Boolean)
 
     fun getBalloonState(): Flow<Boolean>
+
+    suspend fun setPremium(state: Boolean)
+
+    fun getPremiumState(): Flow<Boolean>
 }

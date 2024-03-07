@@ -9,6 +9,7 @@ import android.content.Intent
 
 sealed interface SettingsScreenUIEffect {
 
+    data object StartBillingFlow : SettingsScreenUIEffect
     data object NavigateToHomeScreen : SettingsScreenUIEffect
     data class RunIntentForShareApp(val intent: Intent) : SettingsScreenUIEffect
     data class RunIntentForSendMail(val intent: Intent) : SettingsScreenUIEffect

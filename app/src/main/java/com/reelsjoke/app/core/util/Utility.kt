@@ -37,7 +37,7 @@ object IntentUtility {
 
     fun sendMailIntent() = Intent().apply {
         action = Intent.ACTION_SENDTO
-        data = Uri.parse("mailto:liftingapplication@gmail.com")
+        data = Uri.parse("mailto:reelsjokeapp@gmail.com")
     }
 }
 

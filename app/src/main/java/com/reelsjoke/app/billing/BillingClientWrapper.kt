@@ -21,7 +21,6 @@ import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.queryProductDetails
 import com.reelsjoke.app.domain.repository.IBillingClient
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,11 +28,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 
-class BillingClientWrapper @Inject constructor(
-    @ApplicationContext private val context: Context
+data class BillingClientWrapper(
+    private val context: Context,
+    private val onSuccess: () -> Unit,
 ) : PurchasesUpdatedListener, IBillingClient {
 
     private val TAG = "BillingClient"
@@ -66,6 +65,7 @@ class BillingClientWrapper @Inject constructor(
 
             BillingResponseCode.USER_CANCELED -> _statusText.value = "Purchase Canceled"
             BillingResponseCode.ITEM_ALREADY_OWNED -> _statusText.value = "Product Available"
+            BillingResponseCode.ITEM_UNAVAILABLE -> _statusText.value = "Item Unavailable"
         }
     }
 
@@ -89,7 +89,7 @@ class BillingClientWrapper @Inject constructor(
         val productList = ArrayList<QueryProductDetailsParams.Product>()
         productList.add(
             QueryProductDetailsParams.Product.newBuilder()
-                .setProductId("product_id")
+                .setProductId("premium_id")
                 .setProductType(ProductType.INAPP)
                 .build()
         )
@@ -123,6 +123,7 @@ class BillingClientWrapper @Inject constructor(
 
     private val acknowledgePurchaseListener = AcknowledgePurchaseResponseListener { billingResult ->
         if (billingResult.responseCode == BillingResponseCode.OK) {
+            onSuccess.invoke()
             billingClient.endConnection()
         }
     }
