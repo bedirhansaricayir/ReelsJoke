@@ -7,6 +7,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 val keystorePropertiesFile: File = rootProject.file("keystore.properties")
@@ -116,4 +117,6 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
     implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-crashlytics")
+
 }
