@@ -1,6 +1,5 @@
 package com.reelsjoke.app.data.analytics
 
-import android.util.Log
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.logEvent
 import com.reelsjoke.app.domain.model.AnalyticsEvent
@@ -17,12 +16,9 @@ class FirebaseAnalyticsHelper @Inject constructor(
 
     override fun logEvent(event: AnalyticsEvent) {
         firebaseAnalytics.logEvent(event.type) {
-            Log.d("logging",event.type)
             for (extra in event.extras) {
                 // Truncate parameter keys and values
                 // according to firebase maximum length values.
-                Log.d("param",extra.value.toString())
-
                 param(
                     key = extra.key.take(40),
                     value = extra.value.take(100),
