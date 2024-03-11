@@ -2,6 +2,10 @@ package com.reelsjoke.app.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.reelsjoke.app.core.extensions.logEffectTriggered
+import com.reelsjoke.app.core.extensions.onBalloonClicked
+import com.reelsjoke.app.core.extensions.setPremiumUser
+import com.reelsjoke.app.domain.repository.AnalyticsHelper
 import com.reelsjoke.app.domain.usecase.GetBalloonStateUseCase
 import com.reelsjoke.app.domain.usecase.GetCreatedReelsUseCase
 import com.reelsjoke.app.domain.usecase.GetPremiumStateUseCase
@@ -28,7 +32,8 @@ class HomeScreenViewModel @Inject constructor(
     private val getBalloonStateUseCase: GetBalloonStateUseCase,
     private val setBalloonStateUseCase: SetBalloonStateUseCase,
     private val setPremiumUseCase: SetPremiumUseCase,
-    private val getPremiumStateUseCase: GetPremiumStateUseCase
+    private val getPremiumStateUseCase: GetPremiumStateUseCase,
+    private val analyticsHelper: AnalyticsHelper
 ) : ViewModel() {
 
     private val _state: MutableStateFlow<HomeScreenUIState> =
@@ -56,6 +61,7 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private fun sendEffect(effect: HomeScreenUIEffect) {
+        analyticsHelper.logEffectTriggered("home_screen",effect)
         viewModelScope.launch(Dispatchers.IO) {
             _effects.send(effect)
         }
@@ -88,12 +94,14 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private fun setBalloonState(state: Boolean = true) {
+        analyticsHelper.onBalloonClicked()
         viewModelScope.launch(Dispatchers.IO) {
             setBalloonStateUseCase.invoke(state)
         }
     }
 
     private fun setPremium(state: Boolean = true) {
+        analyticsHelper.setPremiumUser()
         viewModelScope.launch(Dispatchers.IO) {
             setPremiumUseCase.invoke(state)
         }

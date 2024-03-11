@@ -20,6 +20,6 @@ keystore.properties
 /app/release
 *.jks
 *.pepk
-
+/app/*.json
 
 

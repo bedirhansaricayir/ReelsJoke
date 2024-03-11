@@ -3,8 +3,10 @@ package com.reelsjoke.app.presentation.create
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.reelsjoke.app.core.extensions.logEffectTriggered
 import com.reelsjoke.app.domain.model.ErrorType
 import com.reelsjoke.app.domain.model.ScreenInfo
+import com.reelsjoke.app.domain.repository.AnalyticsHelper
 import com.reelsjoke.app.domain.usecase.InsertReelsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateScreenViewModel @Inject constructor(
     private val insertReelsUseCase: InsertReelsUseCase,
+    private val analyticsHelper: AnalyticsHelper
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CreateScreenUIState(isLoading = false))
@@ -56,6 +59,7 @@ class CreateScreenViewModel @Inject constructor(
     }
 
     private fun sendEffect(effect: CreateScreenUIEffect) {
+        analyticsHelper.logEffectTriggered("create_screen",effect)
         viewModelScope.launch(Dispatchers.IO) {
             _effects.send(effect)
         }

@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.reelsjoke.app.core.Contants.Companion.PRIVACY_POLICY
 import com.reelsjoke.app.core.Contants.Companion.TERMS
+import com.reelsjoke.app.core.extensions.logEffectTriggered
+import com.reelsjoke.app.core.extensions.setPremiumUser
+import com.reelsjoke.app.domain.repository.AnalyticsHelper
 import com.reelsjoke.app.domain.usecase.GetSettingsUseCase
 import com.reelsjoke.app.domain.usecase.SetPremiumUseCase
 import com.reelsjoke.app.domain.usecase.successOr
@@ -26,7 +29,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsScreenViewModel @Inject constructor(
     private val getSettingsUseCase: GetSettingsUseCase,
-    private val setPremiumUseCase: SetPremiumUseCase
+    private val setPremiumUseCase: SetPremiumUseCase,
+    private val analyticsHelper: AnalyticsHelper
 ) : ViewModel() {
 
     private val _state: MutableStateFlow<SettingsScreenUIState> =
@@ -53,6 +57,7 @@ class SettingsScreenViewModel @Inject constructor(
     }
 
     private fun sendEffect(effect: SettingsScreenUIEffect) {
+        analyticsHelper.logEffectTriggered("settings_screen",effect)
         viewModelScope.launch(Dispatchers.IO) {
             _effects.send(effect)
         }
@@ -67,6 +72,7 @@ class SettingsScreenViewModel @Inject constructor(
     }
 
     private fun setPremium(state: Boolean = true) {
+        analyticsHelper.setPremiumUser()
         viewModelScope.launch(Dispatchers.IO) {
             setPremiumUseCase.invoke(state)
         }
