@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -30,6 +31,7 @@ fun ReelsJokeApp() {
         val popBackStack: () -> Unit = { if (navController.canGoNavigate) navController.popBackStack() }
         val navigateToCreate: () -> Unit = { navController.navigate(Screen.CreateScreen.route) }
         val navigateToDetail: () -> Unit = { navController.navigate(Screen.DetailScreen.route) }
+        val navigateHome: (builder: NavOptionsBuilder.() -> Unit) -> Unit = { navController.navigate(Screen.HomeScreen.route) }
         val navigateToSettings: () -> Unit = { if (navController.canGoNavigate) navController.navigate(Screen.SettingsScreen.route) }
         val setSavedState: (ScreenInfo) -> Unit = { navController.currentBackStackEntry?.savedStateHandle?.set("screenInfo", it) }
         val getSavedState: () -> ScreenInfo? = { navController.previousBackStackEntry?.savedStateHandle?.get<ScreenInfo>("screenInfo") }
@@ -64,7 +66,12 @@ fun ReelsJokeApp() {
                 navigateToHome = popBackStack
             )
             detailScreen(
-                screenInfo = getSavedState()
+                screenInfo = getSavedState(),
+                navigateToHome = {
+                    navController.takeIf { it.currentBackScreen?.backStackIsCreateScreen == true }
+                        ?.let { navigateHome { popUpTo(0) } }
+                        ?: run { popBackStack() }
+                }
             )
 
             settingsScreen(
@@ -79,6 +86,12 @@ val NavHostController.canGoNavigate: Boolean
 
 val String.isDetailScreen: Boolean
     get() = this == Screen.DetailScreen.route
+
+val String.backStackIsCreateScreen: Boolean
+    get() = this == Screen.CreateScreen.route
+
+val NavHostController.currentBackScreen: String?
+    get() = this.currentBackStackEntry?.destination?.route
 
 
 sealed class Screen(

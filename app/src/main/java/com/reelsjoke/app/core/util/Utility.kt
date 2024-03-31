@@ -10,6 +10,7 @@ import android.provider.MediaStore
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.DialogWindowProvider
+import androidx.core.content.FileProvider
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -68,7 +69,7 @@ object SystemBarUtility {
 }
 
 object SaveImageUtility {
-    fun saveImage(bitmap: Bitmap, context: Context, folderName: String) {
+    fun saveImage(bitmap: Bitmap, context: Context, folderName: String = "ReelsJoke") {
         if (android.os.Build.VERSION.SDK_INT >= 29) {
             val values = contentValues()
             values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/" + folderName)
@@ -118,6 +119,41 @@ object SaveImageUtility {
                 outputStream.close()
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+        }
+    }
+}
+
+class ShareUtils {
+
+    companion object{
+        fun saveBitmapAndGetUri(context: Context, bitmap: Bitmap): Uri? {
+            val path: String = context.externalCacheDir.toString() + "/reelsjoke.jpg"
+            var out: OutputStream? = null
+            val file = File(path)
+            try {
+                out = FileOutputStream(file)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                out.flush()
+                out.close()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            return FileProvider.getUriForFile(
+                context, context.packageName + ".provider", file
+            )
+        }
+
+        fun shareImageToOthers(context: Context, text: String = "ReelsJoke.app", bitmap: Bitmap?) {
+            val imageUri: Uri? = bitmap?.let { saveBitmapAndGetUri(context, it) }
+            val chooserIntent = Intent(Intent.ACTION_SEND)
+            chooserIntent.type = "image/*"
+            chooserIntent.putExtra(Intent.EXTRA_TEXT, text)
+            chooserIntent.putExtra(Intent.EXTRA_STREAM, imageUri)
+            chooserIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            try {
+                context.startActivity(chooserIntent)
+            } catch (ex: Exception) {
             }
         }
     }

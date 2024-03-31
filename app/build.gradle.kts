@@ -119,4 +119,5 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics")
 
+    implementation ("dev.shreyaspatil:capturable:2.1.0")
 }
