@@ -17,8 +17,11 @@ data class ScreenInfo(
     var send: String,
     var taggedPeople: String? = null,
     var location: String? = null,
+    @Transient
     var backgroundImage: Bitmap?,
+    @Transient
     var soundImage: Bitmap?,
+    @Transient
     var userImage: Bitmap?,
     var userTitle: String,
     var isUserFollowed: Boolean,
