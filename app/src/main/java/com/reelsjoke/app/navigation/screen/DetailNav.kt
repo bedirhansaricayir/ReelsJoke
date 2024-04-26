@@ -6,13 +6,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.reelsjoke.app.core.util.SaveImageUtility
-import com.reelsjoke.app.core.util.ShareUtils
 import com.reelsjoke.app.domain.model.ScreenInfo
 import com.reelsjoke.app.navigation.Screen
 import com.reelsjoke.app.presentation.detail.DetailScreen
 import com.reelsjoke.app.presentation.detail.DetailScreenUIEffect
 import com.reelsjoke.app.presentation.detail.DetailScreenViewModel
+import com.reelsjoke.app.presentation.detail.util.SaveImageUtility
+import com.reelsjoke.app.presentation.detail.util.ShareUtils
 
 
 /**
