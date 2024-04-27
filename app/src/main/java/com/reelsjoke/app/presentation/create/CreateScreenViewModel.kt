@@ -7,9 +7,12 @@ import com.reelsjoke.app.core.extensions.logEffectTriggered
 import com.reelsjoke.app.domain.model.ErrorType
 import com.reelsjoke.app.domain.model.ScreenInfo
 import com.reelsjoke.app.domain.repository.AnalyticsHelper
+import com.reelsjoke.app.domain.usecase.GetCreateItemsUseCase
 import com.reelsjoke.app.domain.usecase.InsertReelsUseCase
+import com.reelsjoke.app.domain.usecase.successOr
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +31,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateScreenViewModel @Inject constructor(
     private val insertReelsUseCase: InsertReelsUseCase,
-    private val analyticsHelper: AnalyticsHelper
+    private val analyticsHelper: AnalyticsHelper,
+    private val getCreateItemsUseCase: GetCreateItemsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CreateScreenUIState(isLoading = false))
@@ -36,6 +40,10 @@ class CreateScreenViewModel @Inject constructor(
 
     private val _effects = Channel<CreateScreenUIEffect>()
     val effect = _effects.receiveAsFlow()
+
+    init {
+        getItems()
+    }
 
     fun onEvent(event: CreateScreenUIEvent) {
         when (event) {
@@ -55,6 +63,14 @@ class CreateScreenViewModel @Inject constructor(
             is CreateScreenUIEvent.OnPeopleTaggedChanged -> setPeopleTagged(event.peopleTagged)
             is CreateScreenUIEvent.OnIsLocationExistChanged -> setIsLocationExist(event.isLocationExist)
             is CreateScreenUIEvent.OnLocationChanged -> setLocation(event.location)
+        }
+    }
+
+    private fun getItems() = viewModelScope.launch {
+        val itemsDeferred = async { getCreateItemsUseCase.invoke() }
+        val items = itemsDeferred.await().successOr(emptyList())
+        _state.update { uiState ->
+            uiState.copy(items = items)
         }
     }
 

@@ -20,5 +20,10 @@
     <string name="error_title">Something went wrong</string>
     <string name="refresh_button_title">Refresh Button</string>
     <string name="refresh_button">Refresh</string>
+    <string name="tag_people_title">Tag people</string>
+    <string name="add_location_title">Add location</string>
+    <string name="change_voice_title">Change voice name</string>
+    <string name="user_information_title">User information</string>
+    <string name="feedback_title">Likes,comments,sends</string>
 
 </resources>

@@ -1,7 +1,9 @@
 package com.reelsjoke.app.di
 
+import com.reelsjoke.app.data.repository.CreateScreenRepositoryImpl
 import com.reelsjoke.app.data.repository.ReelsRepositoryImpl
 import com.reelsjoke.app.data.repository.SettingsRepositoryImpl
+import com.reelsjoke.app.domain.repository.CreateScreenRepository
 import com.reelsjoke.app.domain.repository.ReelsRepository
 import com.reelsjoke.app.domain.repository.SettingsRepository
 import dagger.Binds
@@ -23,4 +25,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideSettingsRepository(settingsRepositoryImpl: SettingsRepositoryImpl): SettingsRepository
+
+    @Binds
+    abstract fun provideCreateScreenRepository(createScreenRepositoryImpl: CreateScreenRepositoryImpl): CreateScreenRepository
 }

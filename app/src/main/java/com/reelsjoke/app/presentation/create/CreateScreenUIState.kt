@@ -1,12 +1,14 @@
 package com.reelsjoke.app.presentation.create
 
 import android.graphics.Bitmap
+import com.reelsjoke.app.domain.model.CreateScreenItemData
 
 
 /**
  * Created by bedirhansaricayir on 28.01.2024.
  */
 data class CreateScreenUIState(
+    val items: List<CreateScreenItemData> = emptyList(),
     val isLoading: Boolean = false,
     val infiniteRepeatable: Boolean = false,
     val backgroundImage: Bitmap? = null,
