@@ -1,5 +1,7 @@
 package com.reelsjoke.app.navigation
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,17 +26,23 @@ import com.reelsjoke.app.theme.AppTheme
  * Created by bedirhansaricayir on 20.01.2024.
  */
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun ReelsJokeApp() {
     AppTheme {
         val navController = rememberNavController()
-        val popBackStack: () -> Unit = { if (navController.canGoNavigate) navController.popBackStack() }
+        val popBackStack: () -> Unit =
+            { if (navController.canGoNavigate) navController.popBackStack() }
         val navigateToCreate: () -> Unit = { navController.navigate(Screen.CreateScreen.route) }
         val navigateToDetail: () -> Unit = { navController.navigate(Screen.DetailScreen.route) }
-        val navigateHome: (builder: NavOptionsBuilder.() -> Unit) -> Unit = { navController.navigate(Screen.HomeScreen.route) }
-        val navigateToSettings: () -> Unit = { if (navController.canGoNavigate) navController.navigate(Screen.SettingsScreen.route) }
-        val setSavedState: (ScreenInfo) -> Unit = { navController.currentBackStackEntry?.savedStateHandle?.set("screenInfo", it) }
-        val getSavedState: () -> ScreenInfo? = { navController.previousBackStackEntry?.savedStateHandle?.get<ScreenInfo>("screenInfo") }
+        val navigateHome: (builder: NavOptionsBuilder.() -> Unit) -> Unit =
+            { navController.navigate(Screen.HomeScreen.route) }
+        val navigateToSettings: () -> Unit =
+            { if (navController.canGoNavigate) navController.navigate(Screen.SettingsScreen.route) }
+        val setSavedState: (ScreenInfo) -> Unit =
+            { navController.currentBackStackEntry?.savedStateHandle?.set("screenInfo", it) }
+        val getSavedState: () -> ScreenInfo? =
+            { navController.previousBackStackEntry?.savedStateHandle?.get<ScreenInfo>("screenInfo") }
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination?.route
         var isDetailScreen by remember { mutableStateOf(false) }
@@ -46,37 +54,41 @@ fun ReelsJokeApp() {
         }
         SetSystemUIController(hide = isDetailScreen)
 
-        NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
-            homeScreen(
-                navigateToCreate = navigateToCreate,
-                navigateToDetail = { screenInfo ->
-                    if (navController.canGoNavigate) {
+        SharedTransitionLayout {
+            NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
+                homeScreen(
+                    navigateToCreate = navigateToCreate,
+                    transitionScope = this@SharedTransitionLayout,
+                    navigateToDetail = { screenInfo ->
+                        if (navController.canGoNavigate) {
+                            setSavedState(screenInfo)
+                            navigateToDetail()
+                        }
+                    },
+                    navigateToSettings = navigateToSettings
+                )
+                createScreen(
+                    navigateToDetail = { screenInfo ->
+                        popBackStack()
                         setSavedState(screenInfo)
                         navigateToDetail()
+                    },
+                    navigateToHome = popBackStack
+                )
+                detailScreen(
+                    screenInfo = getSavedState(),
+                    transitionScope = this@SharedTransitionLayout,
+                    navigateToHome = {
+                        navController.takeIf { it.currentBackScreen?.backStackIsCreateScreen == true }
+                            ?.let { navigateHome { popUpTo(0) } }
+                            ?: run { popBackStack() }
                     }
-                },
-                navigateToSettings = navigateToSettings
-            )
-            createScreen(
-                navigateToDetail = { screenInfo ->
-                    popBackStack()
-                    setSavedState(screenInfo)
-                    navigateToDetail()
-                },
-                navigateToHome = popBackStack
-            )
-            detailScreen(
-                screenInfo = getSavedState(),
-                navigateToHome = {
-                    navController.takeIf { it.currentBackScreen?.backStackIsCreateScreen == true }
-                        ?.let { navigateHome { popUpTo(0) } }
-                        ?: run { popBackStack() }
-                }
-            )
+                )
 
-            settingsScreen(
-                popBackStack = popBackStack
-            )
+                settingsScreen(
+                    popBackStack = popBackStack
+                )
+            }
         }
     }
 }

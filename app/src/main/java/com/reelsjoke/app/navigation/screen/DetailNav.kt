@@ -1,5 +1,7 @@
 package com.reelsjoke.app.navigation.screen
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,8 +21,10 @@ import com.reelsjoke.app.presentation.detail.util.ShareUtils
  * Created by bedirhansaricayir on 14.02.2024.
  */
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 fun NavGraphBuilder.detailScreen(
     screenInfo: ScreenInfo?,
+    transitionScope: SharedTransitionScope,
     navigateToHome: () -> Unit
 ) {
     composable(route = Screen.DetailScreen.route) {
@@ -45,8 +49,9 @@ fun NavGraphBuilder.detailScreen(
             }
         }
 
-        DetailScreen(
+        transitionScope.DetailScreen(
             state = state.value,
+            animatedVisibilityScope = this,
             onEvent = viewModel::onEvent
         )
     }

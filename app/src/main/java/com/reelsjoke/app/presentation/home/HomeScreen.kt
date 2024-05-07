@@ -1,5 +1,8 @@
 package com.reelsjoke.app.presentation.home
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -56,33 +59,40 @@ import com.reelsjoke.app.domain.model.ScreenInfo
  * Created by bedirhansaricayir on 20.01.2024.
  */
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun HomeScreen(
+fun SharedTransitionScope.HomeScreen(
     homeUIState: HomeScreenUIState,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     onEvent: (HomeScreenUIEvent) -> Unit,
 ) {
     HomeScreenContent(
         homeUIState = homeUIState,
+        animatedVisibilityScope = animatedVisibilityScope,
         onEvent = onEvent,
     )
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun HomeScreenContent(
+fun SharedTransitionScope.HomeScreenContent(
     homeUIState: HomeScreenUIState,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     onEvent: (HomeScreenUIEvent) -> Unit,
 ) {
     when (homeUIState) {
         is HomeScreenUIState.Error -> ErrorScreen(onClicked = { onEvent(HomeScreenUIEvent.OnRefreshButtonClicked) })
-        is HomeScreenUIState.Success -> HomeScreenWrapper(homeUIState = homeUIState, onEvent = onEvent)
+        is HomeScreenUIState.Success -> HomeScreenWrapper(homeUIState = homeUIState,animatedVisibilityScope = animatedVisibilityScope, onEvent = onEvent)
 
         is HomeScreenUIState.Loading -> LoadingScreen()
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun HomeScreenWrapper(
+fun SharedTransitionScope.HomeScreenWrapper(
     homeUIState: HomeScreenUIState.Success,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     onEvent: (HomeScreenUIEvent) -> Unit,
 ) {
     Scaffold(
@@ -109,6 +119,7 @@ fun HomeScreenWrapper(
         ) {
             HomeScreen(
                 data = homeUIState.data.orEmpty(),
+                animatedVisibilityScope = animatedVisibilityScope,
                 onItemClicked = { item ->
                     onEvent(HomeScreenUIEvent.OnItemClicked(item))
                 },
@@ -121,9 +132,11 @@ fun HomeScreenWrapper(
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun HomeScreen(
+fun SharedTransitionScope.HomeScreen(
     data: List<ScreenInfo>?,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     onItemClicked: (ScreenInfo) -> Unit,
     onSettingsClicked: () -> Unit
 ) {
@@ -153,6 +166,7 @@ fun HomeScreen(
                     items(data.orEmpty()) { screenInfo ->
                         HomeScreenItem(
                             screenInfo = screenInfo,
+                            animatedVisibilityScope = animatedVisibilityScope,
                             onClick = onItemClicked
                         )
                     }
@@ -292,9 +306,11 @@ fun ErrorScreen(
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun HomeScreenItem(
+fun SharedTransitionScope.HomeScreenItem(
     screenInfo: ScreenInfo,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     onClick: (ScreenInfo) -> Unit
 ) {
     Card(
@@ -307,12 +323,17 @@ fun HomeScreenItem(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(8.dp)),
+                .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             AsyncImage(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .sharedElement(
+                        state = rememberSharedContentState(key = "image/${screenInfo.backgroundImage}"),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(8.dp)),
                 model = screenInfo.backgroundImage,
                 contentDescription = "Image",
                 contentScale = ContentScale.Crop

@@ -1,5 +1,7 @@
 package com.reelsjoke.app.navigation.screen
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,7 +24,9 @@ import com.reelsjoke.app.presentation.home.HomeScreenViewModel
  * Created by bedirhansaricayir on 14.02.2024.
  */
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 fun NavGraphBuilder.homeScreen(
+    transitionScope: SharedTransitionScope,
     navigateToCreate: () -> Unit,
     navigateToDetail: (screenInfo: ScreenInfo) -> Unit,
     navigateToSettings: () -> Unit
@@ -43,8 +47,9 @@ fun NavGraphBuilder.homeScreen(
                 }
             }
         }
-        HomeScreen(
+        transitionScope.HomeScreen(
             homeUIState = homeUIState.value,
+            animatedVisibilityScope = this,
             onEvent = viewModel::onEvent,
         )
 
