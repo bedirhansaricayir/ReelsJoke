@@ -23,7 +23,9 @@ object ReelsMapper : Mapper {
             soundImage = soundImage.toBitmap()!!,
             userImage = userImage.toBitmap()!!,
             userTitle = userTitle,
-            isUserFollowed = isUserFollowed
+            isUserFollowed = isUserFollowed,
+            isVerified = isVerified,
+            voiceName = voiceName
         )
     }
 
@@ -40,7 +42,9 @@ object ReelsMapper : Mapper {
             soundImage = soundImage!!.toBase64(),
             userImage = userImage!!.toBase64(),
             userTitle = userTitle,
-            isUserFollowed = isUserFollowed
+            isUserFollowed = isUserFollowed,
+            isVerified = isVerified,
+            voiceName = voiceName
         )
     }
 }

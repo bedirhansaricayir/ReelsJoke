@@ -1,6 +1,7 @@
 package com.reelsjoke.app.presentation.create
 
 import android.graphics.Bitmap
+import com.reelsjoke.app.domain.model.BottomSheetType
 import com.reelsjoke.app.domain.model.CreateScreenItemData
 
 
@@ -9,6 +10,8 @@ import com.reelsjoke.app.domain.model.CreateScreenItemData
  */
 data class CreateScreenUIState(
     val items: List<CreateScreenItemData> = emptyList(),
+    val bottomSheetType: BottomSheetType = BottomSheetType.NONE,
+    val launcherIsOpen: Boolean = false,
     val isLoading: Boolean = false,
     val infiniteRepeatable: Boolean = false,
     val backgroundImage: Bitmap? = null,
@@ -20,9 +23,8 @@ data class CreateScreenUIState(
     val username: String = "",
     val description: String = "",
     val isFollowed: Boolean = false,
-    val isLikesCountHidden: Boolean = true,
-    val isTaggedPeople: Boolean = false,
     val peopleTagged: String = "",
-    val isLocationExist: Boolean = false,
-    val location: String = ""
+    val location: String = "",
+    var isVerified: Boolean = false,
+    var voiceName: String = ""
 )

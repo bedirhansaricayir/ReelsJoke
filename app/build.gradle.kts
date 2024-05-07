@@ -82,6 +82,7 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2024.04.01"))
     implementation("androidx.compose.foundation:foundation:1.7.0-alpha07")
     implementation("androidx.compose.ui:ui:1.7.0-alpha07")
+    implementation("androidx.compose.animation:animation:1.7.0-alpha07")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
@@ -94,7 +95,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     implementation("io.coil-kt:coil-compose:2.4.0")
-    implementation("androidx.navigation:navigation-compose:2.7.6")
+    implementation("androidx.navigation:navigation-compose:2.8.0-alpha07")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
 
     implementation("com.google.dagger:hilt-android:2.48.1")

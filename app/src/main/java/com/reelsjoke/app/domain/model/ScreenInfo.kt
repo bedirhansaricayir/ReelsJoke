@@ -25,6 +25,8 @@ data class ScreenInfo(
     var userImage: Bitmap?,
     var userTitle: String,
     var isUserFollowed: Boolean,
+    var isVerified: Boolean,
+    var voiceName: String
 ) : Serializable {
 
     fun isValid(): Boolean {

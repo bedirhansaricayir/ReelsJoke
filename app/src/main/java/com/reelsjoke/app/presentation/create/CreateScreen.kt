@@ -1,22 +1,17 @@
 package com.reelsjoke.app.presentation.create
 
 
-import android.graphics.Bitmap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,25 +22,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,18 +44,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.reelsjoke.app.R
-import com.reelsjoke.app.core.CustomInputField
-import com.reelsjoke.app.core.RoundedCornerBox
 import com.reelsjoke.app.core.extensions.noRippleClickable
 import com.reelsjoke.app.core.extensions.toBitmap
+import com.reelsjoke.app.domain.model.BottomSheetType
 import com.reelsjoke.app.domain.model.CreateScreenItemData
-import com.reelsjoke.app.domain.model.QuestionType
 import com.reelsjoke.app.presentation.components.dashedBorder
 import com.reelsjoke.app.presentation.create.components.CreateScreenTopBar
 import com.reelsjoke.app.presentation.create.components.CustomTextField
@@ -92,6 +77,11 @@ fun CreateScreenContent(
     snackbarHostState: SnackbarHostState,
     onEvent: (CreateScreenUIEvent) -> Unit
 ) {
+    CreateScreenBottomSheet(
+        state = state,
+        onEvent = onEvent
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -114,58 +104,54 @@ fun CreateScreenContent(
             )
             ReelsImageContainer(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                onImageChanged = { onEvent(CreateScreenUIEvent.OnBackgroundImageChanged(it)) }
+                state = state,
+                onEvent = onEvent
             )
             CustomTextField(
                 modifier = Modifier.padding(horizontal = 8.dp),
                 value = state.description,
                 onValueChanged = {
                     onEvent(CreateScreenUIEvent.OnDescriptionChanged(it))
-                }
+                },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default)
             )
             HorizontalDivider(thickness = 0.5.dp)
             ItemsList(
                 items = state.items,
-                onItemClicked = {
+                onItemClicked = { menuItem ->
+                    when (menuItem) {
+                        R.string.feedback_title -> onEvent(
+                            CreateScreenUIEvent.FeedbackClicked(
+                                bottomSheetType = BottomSheetType.FEEDBACK
+                            )
+                        )
 
+                        R.string.tag_people_title -> onEvent(
+                            CreateScreenUIEvent.TagPeopleClicked(
+                                bottomSheetType = BottomSheetType.TAG_PEOPLE
+                            )
+                        )
+
+                        R.string.add_location_title -> onEvent(
+                            CreateScreenUIEvent.AddLocationClicked(
+                                bottomSheetType = BottomSheetType.ADD_LOCATION
+                            )
+                        )
+
+                        R.string.change_voice_title -> onEvent(
+                            CreateScreenUIEvent.ChangeVoiceClicked(
+                                bottomSheetType = BottomSheetType.CHANGE_VOICE
+                            )
+                        )
+
+                        R.string.user_information_title -> onEvent(
+                            CreateScreenUIEvent.UserInformationClicked(
+                                bottomSheetType = BottomSheetType.USER_INFORMATION
+                            )
+                        )
+                    }
                 }
             )
-
-      /*      ReelsDetail(
-                likesCount = state.likesCount,
-                commentCount = state.commentCount,
-                sendCount = state.sendCount,
-                isLiked = state.isLiked,
-                isLikesCountHidden = state.isLikesCountHidden,
-                isTaggedPeople = state.isTaggedPeople,
-                peopleTagged = state.peopleTagged,
-                isLocationExist = state.isLocationExist,
-                location = state.location,
-                isLikedChanged = { onEvent(CreateScreenUIEvent.OnIsLikedChanged(it)) },
-                onLikesCountChanged = { onEvent(CreateScreenUIEvent.OnLikesCountChanged(it)) },
-                onCommentCountChanged = { onEvent(CreateScreenUIEvent.OnCommentCountChanged(it)) },
-                onSendCountChanged = { onEvent(CreateScreenUIEvent.OnSendCountChanged(it)) },
-                onLikesCountHiddenChanged = {
-                    onEvent(
-                        CreateScreenUIEvent.OnIsLikesCountHiddenChanged(
-                            it
-                        )
-                    )
-                },
-                onIsTaggedPeopleChanged = { onEvent(CreateScreenUIEvent.OnIsTaggedPeopleChanged(it)) },
-                onPeopleTaggedChanged = { onEvent(CreateScreenUIEvent.OnPeopleTaggedChanged(it)) },
-                onIsLocationExistChanged = { onEvent(CreateScreenUIEvent.OnIsLocationExistChanged(it)) },
-                onLocationChanged = { onEvent(CreateScreenUIEvent.OnLocationChanged(it)) }
-            )
-            UserDetail(
-                onImageChanged = { onEvent(CreateScreenUIEvent.OnUserImageChanged(it)) },
-                username = state.username,
-                description = state.description,
-                isFollowed = state.isFollowed,
-                onUsernameChanged = { onEvent(CreateScreenUIEvent.OnUsernameChanged(it)) },
-                onDescriptionChanged = { onEvent(CreateScreenUIEvent.OnDescriptionChanged(it)) },
-                onIsFollowedChanged = { onEvent(CreateScreenUIEvent.OnIsFollowedChanged(it)) }
-            )*/
         }
 
         SnackbarHost(
@@ -180,48 +166,49 @@ fun CreateScreenContent(
 @Composable
 fun ReelsImageContainer(
     modifier: Modifier = Modifier,
-    onImageChanged: (Bitmap) -> Unit
+    state: CreateScreenUIState,
+    onEvent: (CreateScreenUIEvent) -> Unit
 ) {
     val context = LocalContext.current
-    var capturedImage by remember { mutableStateOf<Bitmap?>(null) }
-    var expandedState by remember { mutableStateOf(false) }
     val rotationState by animateFloatAsState(
-        targetValue = if (expandedState) 45f else 0f, label = ""
+        targetValue = if (state.launcherIsOpen) 45f else 0f, label = ""
     )
-    LaunchedEffect(key1 = capturedImage) {
-        capturedImage?.let { image ->
-            onImageChanged(image)
-        }
-    }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { imageUri ->
-            capturedImage = imageUri?.toBitmap(context)
-            expandedState = !expandedState
+            imageUri?.toBitmap(context).also { createdBitmap ->
+                createdBitmap?.let { bitmap ->
+                    onEvent(CreateScreenUIEvent.OnBackgroundImageChanged(bitmap))
+                }
+            }
+            onEvent(CreateScreenUIEvent.OnGalleryLauncherStateChanged)
         }
     )
-
 
     Box(
         modifier = modifier
             .height(250.dp)
             .width(150.dp)
             .dashedBorder(
-                color = if (isSystemInDarkTheme()) Color.White.copy(alpha = 0.7f) else Color.Black.copy(alpha = 0.5f),
+                color = if (isSystemInDarkTheme()) Color.White.copy(alpha = 0.7f) else Color.Black.copy(
+                    alpha = 0.5f
+                ),
                 shape = MaterialTheme.shapes.small
             )
             .noRippleClickable {
-                galleryLauncher.launch(
-                    PickVisualMediaRequest(
-                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                if (!state.launcherIsOpen) {
+                    galleryLauncher.launch(
+                        PickVisualMediaRequest(
+                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                        )
                     )
-                )
-                expandedState = !expandedState
+                    onEvent(CreateScreenUIEvent.OnGalleryLauncherStateChanged)
+                }
             },
         contentAlignment = Alignment.Center
     ) {
-        capturedImage?.let { image ->
+        state.backgroundImage?.let { image ->
             AsyncImage(
                 modifier = Modifier
                     .fillMaxSize()
@@ -238,12 +225,16 @@ fun ReelsImageContainer(
                     modifier = Modifier.rotate(rotationState),
                     imageVector = Icons.Default.Add,
                     contentDescription = "Select Image",
-                    tint = if (isSystemInDarkTheme()) Color.White.copy(alpha = 0.9f) else Color.Black.copy(alpha = 0.7f)
+                    tint = if (isSystemInDarkTheme()) Color.White.copy(alpha = 0.9f) else Color.Black.copy(
+                        alpha = 0.7f
+                    )
                 )
                 Text(
                     text = "Add reels image",
                     fontSize = 10.sp,
-                    color = if (isSystemInDarkTheme()) Color.White.copy(alpha = 0.8f) else Color.Black.copy(alpha = 0.6f)
+                    color = if (isSystemInDarkTheme()) Color.White.copy(alpha = 0.8f) else Color.Black.copy(
+                        alpha = 0.6f
+                    )
                 )
             }
         }
@@ -267,6 +258,7 @@ fun ItemsList(
         }
     }
 }
+
 @Composable
 fun CreateScreenItem(
     modifier: Modifier = Modifier,
@@ -296,319 +288,11 @@ fun CreateScreenItem(
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.weight(1f),
 
-            )
+                )
             Icon(
                 imageVector = Icons.Default.KeyboardArrowRight,
                 contentDescription = "Go Forward",
                 tint = Color.Gray
-            )
-        }
-    }
-
-}
-
-@Composable
-fun ReelsDetail(
-    modifier: Modifier = Modifier,
-    likesCount: String,
-    commentCount: String,
-    sendCount: String,
-    isLiked: Boolean,
-    isLikesCountHidden: Boolean,
-    isTaggedPeople: Boolean,
-    peopleTagged: String,
-    isLocationExist: Boolean,
-    location: String,
-    isLikedChanged: (Boolean) -> Unit,
-    onLikesCountChanged: (String) -> Unit,
-    onCommentCountChanged: (String) -> Unit,
-    onSendCountChanged: (String) -> Unit,
-    onLikesCountHiddenChanged: (Boolean) -> Unit,
-    onIsTaggedPeopleChanged: (Boolean) -> Unit,
-    onPeopleTaggedChanged: (String) -> Unit,
-    onIsLocationExistChanged: (Boolean) -> Unit,
-    onLocationChanged: (String) -> Unit
-) {
-    var isExpanded by remember { mutableStateOf(true) }
-
-    RoundedCornerBox(modifier = modifier) {
-        CornerBoxTitleSection(
-            modifier = Modifier,
-            title = "Reels Detail",
-            isExpanded = isExpanded,
-            onClick = { isExpanded = it }
-        )
-        if (isExpanded) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp)
-                    .animateContentSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalAlignment = Alignment.Start
-            ) {
-                Spacer(modifier = Modifier.height(32.dp))
-                QuestionWithCheckbox(
-                    questionType = QuestionType.IS_LIKED,
-                    state = isLiked,
-                    onCheckedChange = { isLikedChanged(it) }
-                )
-                QuestionWithCheckbox(
-                    questionType = QuestionType.LIKES_COUNT_HIDDEN,
-                    state = isLikesCountHidden,
-                    onCheckedChange = { onLikesCountHiddenChanged(it) }
-                )
-                if (!isLikesCountHidden) {
-                    CustomInputField(
-                        modifier = Modifier.padding(start = 16.dp),
-                        questionType = QuestionType.LIKES_COUNT,
-                        value = likesCount,
-                        imeAction = ImeAction.Next,
-                        onValueChanged = { onLikesCountChanged(it) }
-                    )
-                }
-
-                Row {
-                    CustomInputField(
-                        modifier = Modifier
-                            .width(150.dp)
-                            .padding(start = 16.dp),
-                        questionType = QuestionType.COMMENT_COUNT,
-                        value = commentCount,
-                        imeAction = ImeAction.Next,
-                        onValueChanged = { onCommentCountChanged(it) }
-                    )
-                    CustomInputField(
-                        modifier = Modifier
-                            .width(150.dp)
-                            .padding(start = 16.dp),
-                        questionType = QuestionType.SEND_COUNT,
-                        value = sendCount,
-                        imeAction = ImeAction.Done,
-                        onValueChanged = { onSendCountChanged(it) }
-
-                    )
-                }
-
-                Row {
-                    Column(modifier = Modifier) {
-                        QuestionWithCheckbox(
-                            questionType = QuestionType.IS_LOCATION_EXIST,
-                            state = isLocationExist,
-                            onCheckedChange = { onIsLocationExistChanged(it) }
-                        )
-                        if (isLocationExist) {
-                            CustomInputField(
-                                modifier = Modifier
-                                    .width(150.dp)
-                                    .padding(start = 16.dp),
-                                questionType = QuestionType.LOCATION,
-                                value = location,
-                                imeAction = ImeAction.Done,
-                                onValueChanged = { onLocationChanged(it) }
-                            )
-                        }
-                    }
-                    Column {
-                        QuestionWithCheckbox(
-                            questionType = QuestionType.IS_TAGGED_PEOPLE,
-                            state = isTaggedPeople,
-                            onCheckedChange = { onIsTaggedPeopleChanged(it) }
-                        )
-                        if (isTaggedPeople) {
-                            CustomInputField(
-                                modifier = Modifier
-                                    .width(150.dp)
-                                    .padding(start = 16.dp),
-                                questionType = QuestionType.PEOPLE_TAGGED,
-                                value = peopleTagged,
-                                imeAction = ImeAction.Done,
-                                onValueChanged = { onPeopleTaggedChanged(it) }
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun UserDetail(
-    modifier: Modifier = Modifier,
-    onImageChanged: (Bitmap) -> Unit,
-    username: String,
-    description: String,
-    isFollowed: Boolean,
-    onUsernameChanged: (String) -> Unit,
-    onDescriptionChanged: (String) -> Unit,
-    onIsFollowedChanged: (Boolean) -> Unit
-) {
-    val context = LocalContext.current
-    var isExpanded by remember { mutableStateOf(true) }
-    var capturedImage by remember { mutableStateOf<Bitmap?>(null) }
-
-    LaunchedEffect(key1 = capturedImage) {
-        capturedImage?.let { image ->
-            onImageChanged(image)
-        }
-    }
-
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { imageUri ->
-            capturedImage = imageUri?.toBitmap(context)
-        }
-    )
-
-    RoundedCornerBox(modifier = modifier) {
-        CornerBoxTitleSection(
-            title = "User Detail",
-            isExpanded = isExpanded,
-            onClick = { isExpanded = it }
-        )
-        if (isExpanded) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalAlignment = Alignment.Start
-            ) {
-                Spacer(modifier = Modifier.height(32.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = modifier
-                            .size(100.dp)
-                            .border(
-                                BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .noRippleClickable {
-                                galleryLauncher.launch(
-                                    PickVisualMediaRequest(
-                                        ActivityResultContracts.PickVisualMedia.ImageOnly
-                                    )
-                                )
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        capturedImage?.let { image ->
-                            AsyncImage(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(RoundedCornerShape(8.dp)),
-                                model = image,
-                                contentDescription = "Selected Image",
-                                contentScale = ContentScale.Crop,
-                            )
-                        } ?: run {
-                            Icon(
-                                modifier = Modifier.size(width = 35.dp, height = 50.dp),
-                                painter = painterResource(id = R.drawable.ic_gallery),
-                                contentDescription = "Select Image",
-                                tint = Color.Gray
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .align(Alignment.BottomCenter)
-                                    .padding(8.dp),
-                                text = "User Image",
-                                fontSize = 12.sp,
-                                color = if (isSystemInDarkTheme()) Color.Gray else Color.DarkGray
-                            )
-                        }
-                    }
-
-                    Column {
-                        CustomInputField(
-                            modifier = Modifier.width(150.dp),
-                            questionType = QuestionType.USERNAME,
-                            value = username,
-                            imeAction = ImeAction.Done,
-                            onValueChanged = { onUsernameChanged(it) }
-                        )
-                        QuestionWithCheckbox(
-                            questionType = QuestionType.IS_FOLLOWED,
-                            state = isFollowed,
-                            onCheckedChange = { onIsFollowedChanged(it) }
-
-                        )
-                    }
-                }
-                CustomInputField(
-                    modifier = Modifier.fillMaxWidth(),
-                    questionType = QuestionType.DESCRIPTION,
-                    value = description,
-                    imeAction = ImeAction.Done,
-                    onValueChanged = { onDescriptionChanged(it) }
-
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun CornerBoxTitleSection(
-    modifier: Modifier = Modifier,
-    title: String,
-    isExpanded: Boolean,
-    onClick: (Boolean) -> Unit
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = title,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.W600
-        )
-        IconButton(onClick = { onClick(!isExpanded) }) {
-            Icon(
-                imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = "Expand Button",
-                tint = MaterialTheme.colorScheme.onBackground
-            )
-        }
-    }
-}
-
-@Composable
-fun QuestionWithCheckbox(
-    modifier: Modifier = Modifier,
-    questionType: QuestionType,
-    state: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-
-    Column(
-        modifier = modifier
-            .padding(horizontal = 16.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = questionType.question,
-                color = MaterialTheme.colorScheme.onBackground,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.W500
-            )
-            Checkbox(
-                checked = state,
-                onCheckedChange = {
-                    onCheckedChange(it)
-                }
             )
         }
     }

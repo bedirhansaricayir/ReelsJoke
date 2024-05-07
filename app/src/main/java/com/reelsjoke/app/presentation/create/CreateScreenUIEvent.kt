@@ -1,6 +1,7 @@
 package com.reelsjoke.app.presentation.create
 
 import android.graphics.Bitmap
+import com.reelsjoke.app.domain.model.BottomSheetType
 
 
 /**
@@ -25,13 +26,31 @@ sealed interface CreateScreenUIEvent {
     data class OnDescriptionChanged(val description: String) : CreateScreenUIEvent
 
     data class OnIsFollowedChanged(val isFollowed: Boolean) : CreateScreenUIEvent
-    data class OnIsLikesCountHiddenChanged(val isLikesCountHidden: Boolean) : CreateScreenUIEvent
-
-    data class OnIsTaggedPeopleChanged(val isTaggedPeople: Boolean) : CreateScreenUIEvent
 
     data class OnPeopleTaggedChanged(val peopleTagged: String) : CreateScreenUIEvent
 
-    data class OnIsLocationExistChanged(val isLocationExist: Boolean) : CreateScreenUIEvent
-
     data class OnLocationChanged(val location: String) : CreateScreenUIEvent
+
+    data class OnIsVerifiedChanged(val isVerified: Boolean) : CreateScreenUIEvent
+
+    data class OnVoiceNameChanged(val voiceName: String) : CreateScreenUIEvent
+
+    data class FeedbackClicked(val bottomSheetType: BottomSheetType) : CreateScreenUIEvent
+
+    data class TagPeopleClicked(val bottomSheetType: BottomSheetType) : CreateScreenUIEvent
+
+    data class AddLocationClicked(val bottomSheetType: BottomSheetType) : CreateScreenUIEvent
+
+    data class ChangeVoiceClicked(val bottomSheetType: BottomSheetType) : CreateScreenUIEvent
+
+    data class UserInformationClicked(val bottomSheetType: BottomSheetType) : CreateScreenUIEvent
+
+    data class BottomSheetDismissClicked(val bottomSheetType: BottomSheetType = BottomSheetType.NONE) : CreateScreenUIEvent
+
+    data object BottomSheetDoneClicked : CreateScreenUIEvent
+
+    data class BottomSheetUsernameClicked(val bottomSheetType: BottomSheetType) : CreateScreenUIEvent
+
+    data object OnGalleryLauncherStateChanged : CreateScreenUIEvent
+
 }

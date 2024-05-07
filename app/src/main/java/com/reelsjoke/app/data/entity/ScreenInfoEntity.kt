@@ -24,4 +24,6 @@ data class ScreenInfoEntity(
     val userImage: String,
     val userTitle: String,
     val isUserFollowed: Boolean,
+    val isVerified: Boolean,
+    val voiceName: String
 )

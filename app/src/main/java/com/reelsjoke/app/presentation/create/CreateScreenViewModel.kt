@@ -1,9 +1,9 @@
 package com.reelsjoke.app.presentation.create
 
-import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.reelsjoke.app.core.extensions.logEffectTriggered
+import com.reelsjoke.app.domain.model.BottomSheetType
 import com.reelsjoke.app.domain.model.ErrorType
 import com.reelsjoke.app.domain.model.ScreenInfo
 import com.reelsjoke.app.domain.repository.AnalyticsHelper
@@ -49,20 +49,29 @@ class CreateScreenViewModel @Inject constructor(
         when (event) {
             is CreateScreenUIEvent.OnExportClicked -> exportClicked()
             is CreateScreenUIEvent.OnBackButtonClicked -> sendEffect(CreateScreenUIEffect.NavigateToHomeScreen)
-            is CreateScreenUIEvent.OnBackgroundImageChanged -> setBackgroundImage(event.backgroundImage)
-            is CreateScreenUIEvent.OnIsLikedChanged -> setIsLiked(event.isLiked)
-            is CreateScreenUIEvent.OnLikesCountChanged -> setLikesCount(event.likesCount)
-            is CreateScreenUIEvent.OnCommentCountChanged -> setCommentCount(event.commentCount)
-            is CreateScreenUIEvent.OnSendCountChanged -> setSendCount(event.sendCount)
-            is CreateScreenUIEvent.OnUserImageChanged -> setUserImage(event.userImage)
-            is CreateScreenUIEvent.OnUsernameChanged -> setUsername(event.username)
-            is CreateScreenUIEvent.OnDescriptionChanged -> setDescription(event.description)
-            is CreateScreenUIEvent.OnIsFollowedChanged -> setIsFollowed(event.isFollowed)
-            is CreateScreenUIEvent.OnIsLikesCountHiddenChanged -> setIsLikesCountHidden(event.isLikesCountHidden)
-            is CreateScreenUIEvent.OnIsTaggedPeopleChanged -> setIsTaggedPeople(event.isTaggedPeople)
-            is CreateScreenUIEvent.OnPeopleTaggedChanged -> setPeopleTagged(event.peopleTagged)
-            is CreateScreenUIEvent.OnIsLocationExistChanged -> setIsLocationExist(event.isLocationExist)
-            is CreateScreenUIEvent.OnLocationChanged -> setLocation(event.location)
+            is CreateScreenUIEvent.OnBackgroundImageChanged -> updateState { it.copy(backgroundImage = event.backgroundImage) }
+            is CreateScreenUIEvent.OnIsLikedChanged -> updateState { it.copy(isLiked = event.isLiked) }
+            is CreateScreenUIEvent.OnLikesCountChanged -> updateState { it.copy(likesCount = event.likesCount) }
+            is CreateScreenUIEvent.OnCommentCountChanged -> updateState { it.copy(commentCount = event.commentCount) }
+            is CreateScreenUIEvent.OnSendCountChanged -> updateState { it.copy(sendCount = event.sendCount) }
+            is CreateScreenUIEvent.OnUserImageChanged -> updateState { it.copy(userImage = event.userImage) }
+            is CreateScreenUIEvent.OnUsernameChanged -> updateState { it.copy(username = event.username) }
+            is CreateScreenUIEvent.OnDescriptionChanged -> updateState { it.copy(description = event.description) }
+            is CreateScreenUIEvent.OnIsFollowedChanged -> updateState { it.copy(isFollowed = event.isFollowed) }
+            is CreateScreenUIEvent.OnPeopleTaggedChanged -> updateState { it.copy(peopleTagged = event.peopleTagged) }
+            is CreateScreenUIEvent.OnLocationChanged -> updateState { it.copy(location = event.location) }
+            is CreateScreenUIEvent.OnGalleryLauncherStateChanged -> updateState { it.copy(launcherIsOpen = !it.launcherIsOpen) }
+            is CreateScreenUIEvent.OnVoiceNameChanged -> updateState { it.copy(voiceName = event.voiceName) }
+            is CreateScreenUIEvent.OnIsVerifiedChanged -> updateState { it.copy(isVerified = event.isVerified) }
+            is CreateScreenUIEvent.AddLocationClicked -> updateState { it.copy(bottomSheetType = event.bottomSheetType) }
+            is CreateScreenUIEvent.ChangeVoiceClicked -> updateState { it.copy(bottomSheetType = event.bottomSheetType) }
+            is CreateScreenUIEvent.FeedbackClicked -> updateState { it.copy(bottomSheetType = event.bottomSheetType) }
+            is CreateScreenUIEvent.TagPeopleClicked -> updateState { it.copy(bottomSheetType = event.bottomSheetType) }
+            is CreateScreenUIEvent.UserInformationClicked -> updateState { it.copy(bottomSheetType = event.bottomSheetType) }
+            is CreateScreenUIEvent.BottomSheetDismissClicked -> updateState { it.copy(bottomSheetType = event.bottomSheetType) }
+            is CreateScreenUIEvent.BottomSheetDoneClicked -> updateState { it.copy(bottomSheetType = BottomSheetType.NONE) }
+            is CreateScreenUIEvent.BottomSheetUsernameClicked -> updateState { it.copy(bottomSheetType = event.bottomSheetType) }
+
         }
     }
 
@@ -109,7 +118,7 @@ class CreateScreenViewModel @Inject constructor(
             return ScreenInfo(
                 description,
                 isLiked,
-                if (isLikesCountHidden) "Likes" else likesCount,
+                likesCount,
                 commentCount,
                 sendCount,
                 peopleTagged,
@@ -118,7 +127,9 @@ class CreateScreenViewModel @Inject constructor(
                 userImage,
                 userImage,
                 username,
-                isFollowed
+                isFollowed,
+                isVerified,
+                voiceName
             )
         }
     }
@@ -148,88 +159,8 @@ class CreateScreenViewModel @Inject constructor(
             insertReelsUseCase.invoke(screenInfo)
         }
     }
+    private fun updateState(update: (CreateScreenUIState) -> CreateScreenUIState) = _state.update(update)
 
-    private fun setBackgroundImage(backgroundImage: Bitmap) {
-        _state.update { state ->
-            state.copy(backgroundImage = backgroundImage)
-        }
-    }
 
-    private fun setIsLiked(isLiked: Boolean) {
-        _state.update { state ->
-            state.copy(isLiked = isLiked)
-        }
-    }
 
-    private fun setLikesCount(likesCount: String) {
-        _state.update { state ->
-            state.copy(likesCount = likesCount)
-        }
-    }
-
-    private fun setCommentCount(commentCount: String) {
-        _state.update { state ->
-            state.copy(commentCount = commentCount)
-        }
-    }
-
-    private fun setSendCount(sendCount: String) {
-        _state.update { state ->
-            state.copy(sendCount = sendCount)
-        }
-    }
-
-    private fun setUserImage(userImage: Bitmap) {
-        _state.update { state ->
-            state.copy(userImage = userImage)
-        }
-    }
-
-    private fun setUsername(username: String) {
-        _state.update { state ->
-            state.copy(username = username)
-        }
-    }
-
-    private fun setDescription(description: String) {
-        _state.update { state ->
-            state.copy(description = description)
-        }
-    }
-
-    private fun setIsFollowed(isFollowed: Boolean) {
-        _state.update { state ->
-            state.copy(isFollowed = isFollowed)
-        }
-    }
-
-    private fun setIsLikesCountHidden(isLikesCountHidden: Boolean) {
-        _state.update { state ->
-            state.copy(isLikesCountHidden = isLikesCountHidden)
-        }
-    }
-
-    private fun setIsTaggedPeople(isTaggedPeople: Boolean) {
-        _state.update { state ->
-            state.copy(isTaggedPeople = isTaggedPeople)
-        }
-    }
-
-    private fun setPeopleTagged(peopleTagged: String) {
-        _state.update { state ->
-            state.copy(peopleTagged = peopleTagged)
-        }
-    }
-
-    private fun setIsLocationExist(isLocationExist: Boolean) {
-        _state.update { state ->
-            state.copy(isLocationExist = isLocationExist)
-        }
-    }
-
-    private fun setLocation(location: String) {
-        _state.update { state ->
-            state.copy(location = location)
-        }
-    }
 }

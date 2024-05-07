@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -88,6 +89,8 @@ fun UserSection(
     ) {
         UserImage(image = screenInfo.userImage)
         UserTitle(title = screenInfo.userTitle)
+        if (screenInfo.isVerified)
+            Icon(painter = painterResource(id = R.drawable.verified_badge), contentDescription = "Verified Icon", tint = Color.Unspecified)
         FollowButton(isFollowed = screenInfo.isUserFollowed)
     }
 }
@@ -192,7 +195,7 @@ fun BottomDetailTrackBarItems(
             modifier = Modifier
                 .widthIn(max = soundTrackDp),
             icon = R.drawable.ic_music,
-            text = screenInfo.description
+            text = screenInfo.voiceName
         )
         Spacer(modifier = Modifier.width(8.dp))
         screenInfo.location?.let { location ->
